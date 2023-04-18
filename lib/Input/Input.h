@@ -30,4 +30,16 @@ private:
     InputState key_state[static_cast<int>(Key::Count)]{};
 };
 
+class GloveInput {
+public:
+    GloveInput();
+
+    void update();
+    InputState inputState(Input input) const;
+
+private:
+    enum class Finger { P = 0, R, M, I, Count };
+    InputState finger_state[static_cast<int>(Finger::Count)]{};
+};
+
 #endif /* _INPUT_H */
