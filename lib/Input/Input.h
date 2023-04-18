@@ -3,6 +3,14 @@
 
 #include <Arduino.h>
 
+// change to pin numbers
+#define PINKY 13
+#define RING 0
+#define MIDDLE 23
+#define INDEX 12
+
+int touch_pins[4] = {PINKY, RING, MIDDLE, INDEX};
+
 enum class Input {
     Input1 = 0,
     Input2,
@@ -32,14 +40,15 @@ private:
 
 class GloveInput {
 public:
-    GloveInput();
+    GloveInput(int pinky_pin, int ring_pin, int middle_pin, int index_pin);
 
     void update();
     InputState inputState(Input input) const;
 
 private:
-    enum class Finger { P = 0, R, M, I, Count };
+    enum class Finger { Pinky = 0, Ring, Middle, Index, Count };
     InputState finger_state[static_cast<int>(Finger::Count)]{};
+    int pins[static_cast<int>(Finger::Count)];
 };
 
 #endif /* _INPUT_H */
