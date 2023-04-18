@@ -43,11 +43,14 @@ public:
     GloveInput(int pinky_pin, int ring_pin, int middle_pin, int index_pin);
 
     void update();
+
     InputState inputState(Input input) const;
 
 private:
     enum class Finger { Pinky = 0, Ring, Middle, Index, Count };
+
     InputState finger_state[static_cast<int>(Finger::Count)]{};
+
     int pins[static_cast<int>(Finger::Count)];
 };
 
