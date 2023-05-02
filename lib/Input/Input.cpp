@@ -1,5 +1,13 @@
 #include "Input.h"
 
+// TODO: change to pin numbers
+#define PINKY 13
+#define RING 0
+#define MIDDLE 23
+#define INDEX 12
+
+static int touch_pins[4] = {PINKY, RING, MIDDLE, INDEX};
+
 KeyboardInput::KeyboardInput() {
     for (size_t i = 0; i < static_cast<int>(Key::Count); i++) {
         key_state[i] = InputState::Inactive;

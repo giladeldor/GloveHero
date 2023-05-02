@@ -3,14 +3,6 @@
 
 #include <Arduino.h>
 
-// change to pin numbers
-#define PINKY 13
-#define RING 0
-#define MIDDLE 23
-#define INDEX 12
-
-int touch_pins[4] = {PINKY, RING, MIDDLE, INDEX};
-
 enum class Input {
     Input1 = 0,
     Input2,
