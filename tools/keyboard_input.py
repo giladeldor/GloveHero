@@ -14,8 +14,13 @@
 
 from pynput import keyboard
 from serial import Serial
+from sys import argv
 
-serial = Serial("/dev/ttyUSB0", 9600)
+if len(argv) != 2:
+    print("Usage: keyboard_input.py <serial port>")
+    exit(1)
+    
+serial = Serial(argv[1], 9600)
 
 
 def on_press(key):
