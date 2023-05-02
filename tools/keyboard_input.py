@@ -7,7 +7,7 @@
 #  pip install -r requirements.txt
 #
 # Usage:
-#  ./keyboard_input.py
+#  ./keyboard_input.py <serial port>
 #
 # Use hjkl for inputs 1-4 respectively.
 # In the device code use `KeyboardInput` to respond to these events.
@@ -19,7 +19,7 @@ from sys import argv
 if len(argv) != 2:
     print("Usage: keyboard_input.py <serial port>")
     exit(1)
-    
+
 serial = Serial(argv[1], 9600)
 
 
