@@ -1,145 +1,279 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Permission.bluetoothScan.request();
+  await Permission.bluetoothConnect.request();
+
+  final bleModel = BleModel();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => bleModel,
+      child: const BleApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class BleApp extends StatelessWidget {
+  const BleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) => Consumer<BleModel>(
+        builder: (context, bleModel, child) {
+          late Widget body;
+          switch (bleModel.connectionState) {
+            case ConnectionState.disconnected:
+              body = const DisconnectedScreen();
+              break;
+            case ConnectionState.connecting:
+              body = const ConnectingScreen();
+              break;
+            case ConnectionState.connected:
+              body = const ConnectedScreen();
+              break;
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("BLE Test"),
+            ),
+            backgroundColor: Colors.white,
+            body: body,
+            floatingActionButton: _getFab(bleModel),
+          );
+        },
+      );
+
+  Widget _getFab(BleModel bleModel) {
+    void Function()? onPressed;
+    late IconData icon;
+
+    switch (bleModel.connectionState) {
+      case ConnectionState.disconnected:
+        onPressed = bleModel.connect;
+        icon = Icons.bluetooth;
+        break;
+      case ConnectionState.connecting:
+        icon = Icons.bluetooth_connected;
+        break;
+      case ConnectionState.connected:
+        icon = Icons.bluetooth_disabled;
+        onPressed = bleModel.disconnect;
+        break;
+      default:
+    }
+
+    return FloatingActionButton(
+      onPressed: onPressed,
+      child: Icon(icon),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  bool _foundDeviceWaitingToConnect = false;
-  bool _scanStarted = false;
-  bool _connected = false;
-
-  late DiscoveredDevice _gloveDevice;
-  final FlutterReactiveBle _reactiveBle = FlutterReactiveBle();
-  late StreamSubscription<DiscoveredDevice> _scanStream;
-  late QualifiedCharacteristic _characteristic;
-
-  static final Uuid _serviceUuid =
-      Uuid.parse("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
-  static final Uuid _characteristicUuid =
-      Uuid.parse("beb5483e-36e1-4688-b7f5-ea07361b26a8");
-
-  void _startScan() async {
-    await Permission.bluetoothScan.request();
-    await Permission.bluetoothConnect.request();
-
-    setState(() {
-      _scanStarted = true;
-    });
-
-    _scanStream = _reactiveBle.scanForDevices(
-        withServices: [_serviceUuid], scanMode: ScanMode.lowLatency).listen(
-      (device) {
-        if (device.name == "GloveHero") {
-          setState(() {
-            _foundDeviceWaitingToConnect = true;
-            _gloveDevice = device;
-          });
-        }
-      },
-      onError: (Object error) {
-        print(error);
-      },
-    );
-  }
-
-  void _connectToDevice() {
-    _scanStream.cancel();
-    final connectionStream = _reactiveBle.connectToDevice(
-      id: _gloveDevice.id,
-      connectionTimeout: const Duration(seconds: 2),
-    );
-    connectionStream.listen((event) {
-      switch (event.connectionState) {
-        case DeviceConnectionState.connected:
-          _characteristic = QualifiedCharacteristic(
-            characteristicId: _characteristicUuid,
-            serviceId: _serviceUuid,
-            deviceId: event.deviceId,
-          );
-
-          setState(() {
-            _foundDeviceWaitingToConnect = false;
-            _connected = true;
-          });
-          break;
-
-        case DeviceConnectionState.disconnected:
-          print("Disconnected");
-          break;
-
-        default:
-      }
-    });
-  }
-
-  void _partyTime() async {
-    if (_connected) {
-      final value = await _reactiveBle.readCharacteristic(_characteristic);
-      print(utf8.decode(value));
-    }
-  }
+class DisconnectedScreen extends StatelessWidget {
+  const DisconnectedScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(),
-      persistentFooterButtons: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: _scanStarted ? Colors.grey : Colors.blue,
-            onPrimary: Colors.white,
-          ),
-          onPressed: _scanStarted ? () {} : _startScan,
-          child: const Icon(Icons.search),
+    return const Align(
+      alignment: Alignment.center,
+      child: Text(
+        "Connect to continue",
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.w500,
+          color: Colors.black54,
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: _foundDeviceWaitingToConnect ? Colors.blue : Colors.grey,
-            onPrimary: Colors.white,
-          ),
-          onPressed: _foundDeviceWaitingToConnect ? _connectToDevice : () {},
-          child: const Icon(Icons.bluetooth),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: _connected ? Colors.blue : Colors.grey,
-            onPrimary: Colors.white,
-          ),
-          onPressed: _connected ? _partyTime : () {},
-          child: const Icon(Icons.celebration_rounded),
-        ),
-      ],
+      ),
     );
+  }
+}
+
+class ConnectingScreen extends StatelessWidget {
+  const ConnectingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => SpinKitWave(
+        color: Theme.of(context).colorScheme.primaryContainer,
+      );
+}
+
+class ConnectedScreen extends StatelessWidget {
+  const ConnectedScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => Consumer<BleModel>(
+        builder: (context, bleModel, child) {
+          final text = "Value:    ${bleModel.idxValue}";
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ColorPicker(
+                color: bleModel.color,
+                onColorChanged: (value) {
+                  print(
+                      "Red: ${value.red} Green: ${value.green} Blue: ${value.blue}");
+                  bleModel.color = value;
+                },
+              ),
+              Expanded(
+                flex: 1,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text(
+                    text,
+                    style: const TextStyle(fontSize: 40),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(),
+              )
+            ],
+          );
+        },
+      );
+}
+
+enum ConnectionState {
+  disconnected,
+  connecting,
+  connected,
+}
+
+class BleModel extends ChangeNotifier {
+  static final Uuid _serviceUuid =
+      Uuid.parse("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+  static final Uuid _idxCharacteristicUuid =
+      Uuid.parse("beb5483e-36e1-4688-b7f5-ea07361b26a8");
+  static final Uuid _colorCharacteristicUuid =
+      Uuid.parse("86c7baf6-9d1f-4004-85aa-70aa37e18055");
+
+  final _ble = FlutterReactiveBle();
+
+  StreamSubscription<ConnectionStateUpdate>? _connectionStream;
+
+  ConnectionState __connectionState = ConnectionState.disconnected;
+  ConnectionState get connectionState => __connectionState;
+
+  set _connectionState(ConnectionState state) {
+    __connectionState = state;
+    notifyListeners();
+  }
+
+  QualifiedCharacteristic? _idxCharacteristic;
+  String __idxValue = "";
+
+  String get idxValue => __idxValue;
+
+  set _idxValue(String value) {
+    __idxValue = value;
+    notifyListeners();
+  }
+
+  QualifiedCharacteristic? _colorCharacteristic;
+  Color? _color;
+
+  Color get color => _color!;
+
+  set color(Color value) {
+    _color = value;
+    _ble.writeCharacteristicWithResponse(
+      _colorCharacteristic!,
+      value: [color.red, color.green, color.blue],
+    );
+    notifyListeners();
+  }
+
+  Future<Color> _getColorValue() async {
+    final value = await _ble.readCharacteristic(_colorCharacteristic!);
+    return Color.fromARGB(
+      255,
+      value[0],
+      value[1],
+      value[2],
+    );
+  }
+
+  void connect() async {
+    _connectionState = ConnectionState.connecting;
+    await for (final device in _ble.scanForDevices(
+      withServices: [],
+      scanMode: ScanMode.lowLatency,
+    )) {
+      if (device.name != "GloveHero") {
+        continue;
+      }
+
+      _connectionStream =
+          _ble.connectToDevice(id: device.id).listen((event) async {
+        switch (event.connectionState) {
+          case DeviceConnectionState.connected:
+            assert(event.deviceId == device.id);
+
+            _idxCharacteristic = QualifiedCharacteristic(
+              characteristicId: _idxCharacteristicUuid,
+              serviceId: _serviceUuid,
+              deviceId: event.deviceId,
+            );
+            _colorCharacteristic = QualifiedCharacteristic(
+              characteristicId: _colorCharacteristicUuid,
+              serviceId: _serviceUuid,
+              deviceId: event.deviceId,
+            );
+
+            _ble.subscribeToCharacteristic(_idxCharacteristic!).listen(
+                  (data) => _idxValue = utf8.decode(data),
+                );
+
+            final s = await _ble.readCharacteristic(_idxCharacteristic!);
+            _color = await _getColorValue();
+            _connectionState = ConnectionState.connected;
+            break;
+
+          default:
+        }
+      });
+      break;
+    }
+  }
+
+  void disconnect() async {
+    await _connectionStream?.cancel();
+    _connectionState = ConnectionState.disconnected;
+    _idxValue = "";
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _connectionStream?.cancel();
   }
 }
