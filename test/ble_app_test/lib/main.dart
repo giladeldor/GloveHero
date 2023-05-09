@@ -118,7 +118,7 @@ class ConnectingScreen extends StatelessWidget {
   const ConnectingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => SpinKitWave(
+  Widget build(BuildContext context) => SpinKitFoldingCube(
         color: Theme.of(context).colorScheme.primaryContainer,
       );
 }
@@ -136,11 +136,7 @@ class ConnectedScreen extends StatelessWidget {
             children: [
               ColorPicker(
                 color: bleModel.color,
-                onColorChanged: (value) {
-                  print(
-                      "Red: ${value.red} Green: ${value.green} Blue: ${value.blue}");
-                  bleModel.color = value;
-                },
+                onColorChanged: (value) => bleModel.color = value,
               ),
               Expanded(
                 flex: 1,
@@ -171,7 +167,7 @@ enum ConnectionState {
 class BleModel extends ChangeNotifier {
   static final Uuid _serviceUuid =
       Uuid.parse("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
-  static final Uuid _idxCharacteristicUuid =
+  static final Uuid _touchCharacteristicUuid =
       Uuid.parse("beb5483e-36e1-4688-b7f5-ea07361b26a8");
   static final Uuid _colorCharacteristicUuid =
       Uuid.parse("86c7baf6-9d1f-4004-85aa-70aa37e18055");
@@ -184,17 +180,25 @@ class BleModel extends ChangeNotifier {
   ConnectionState get connectionState => __connectionState;
 
   set _connectionState(ConnectionState state) {
+    if (state == __connectionState) {
+      return;
+    }
+
     __connectionState = state;
     notifyListeners();
   }
 
-  QualifiedCharacteristic? _idxCharacteristic;
-  String __idxValue = "";
+  QualifiedCharacteristic? _touchCharacteristic;
+  String __touchValue = "";
 
-  String get idxValue => __idxValue;
+  String get idxValue => __touchValue;
 
-  set _idxValue(String value) {
-    __idxValue = value;
+  set _touchValue(String value) {
+    if (value == __touchValue) {
+      return;
+    }
+
+    __touchValue = value;
     notifyListeners();
   }
 
@@ -238,8 +242,8 @@ class BleModel extends ChangeNotifier {
           case DeviceConnectionState.connected:
             assert(event.deviceId == device.id);
 
-            _idxCharacteristic = QualifiedCharacteristic(
-              characteristicId: _idxCharacteristicUuid,
+            _touchCharacteristic = QualifiedCharacteristic(
+              characteristicId: _touchCharacteristicUuid,
               serviceId: _serviceUuid,
               deviceId: event.deviceId,
             );
@@ -249,11 +253,13 @@ class BleModel extends ChangeNotifier {
               deviceId: event.deviceId,
             );
 
-            _ble.subscribeToCharacteristic(_idxCharacteristic!).listen(
-                  (data) => _idxValue = utf8.decode(data),
-                );
+            _ble.subscribeToCharacteristic(_touchCharacteristic!).listen(
+              (data) {
+                _touchValue = utf8.decode(data);
+              },
+            );
 
-            final s = await _ble.readCharacteristic(_idxCharacteristic!);
+            final s = await _ble.readCharacteristic(_touchCharacteristic!);
             _color = await _getColorValue();
             _connectionState = ConnectionState.connected;
             break;
@@ -268,7 +274,7 @@ class BleModel extends ChangeNotifier {
   void disconnect() async {
     await _connectionStream?.cancel();
     _connectionState = ConnectionState.disconnected;
-    _idxValue = "";
+    _touchValue = "";
   }
 
   @override
