@@ -1,26 +1,21 @@
 #include "Input.h"
 
-// TODO: change to pin numbers
-#define PINKY 13
-#define RING 0
-#define MIDDLE 23
-#define INDEX 12
-
-static int touch_pins[4] = {PINKY, RING, MIDDLE, INDEX};
-
 KeyboardInput::KeyboardInput() {
-    for (size_t i = 0; i < static_cast<int>(Key::Count); i++) {
+    for (size_t i = 0; i < NUM_INPUTS; i++) {
         key_state[i] = InputState::Inactive;
     }
 }
 
-void KeyboardInput::update() {
+Input KeyboardInput::update() {
+    Input state = Input::None;
+
     if (Serial.available()) {
         char c = Serial.read();
 
         switch (c) {
             case 'h':
                 key_state[static_cast<int>(Key::H)] = InputState::Active;
+                state = Input::Input1;
                 break;
             case 'H':
                 key_state[static_cast<int>(Key::H)] = InputState::Inactive;
@@ -28,6 +23,7 @@ void KeyboardInput::update() {
 
             case 'j':
                 key_state[static_cast<int>(Key::J)] = InputState::Active;
+                state = Input::Input2;
                 break;
             case 'J':
                 key_state[static_cast<int>(Key::J)] = InputState::Inactive;
@@ -35,6 +31,7 @@ void KeyboardInput::update() {
 
             case 'k':
                 key_state[static_cast<int>(Key::K)] = InputState::Active;
+                state = Input::Input3;
                 break;
             case 'K':
                 key_state[static_cast<int>(Key::K)] = InputState::Inactive;
@@ -42,11 +39,14 @@ void KeyboardInput::update() {
 
             case 'l':
                 key_state[static_cast<int>(Key::L)] = InputState::Active;
+                state = Input::Input4;
                 break;
             case 'L':
                 key_state[static_cast<int>(Key::L)] = InputState::Inactive;
                 break;
         }
+
+        return state;
     }
 }
 
@@ -60,7 +60,7 @@ GloveInput::GloveInput(int pinky_pin,
                        int ring_pin,
                        int middle_pin,
                        int index_pin) {
-    for (size_t i = 0; i < static_cast<int>(Finger::Count); i++) {
+    for (size_t i = 0; i < NUM_INPUTS; i++) {
         finger_state[i] = InputState::Inactive;
     }
 
@@ -70,11 +70,17 @@ GloveInput::GloveInput(int pinky_pin,
     pins[static_cast<int>(Finger::Index)] = index_pin;
 }
 
-void GloveInput::update() {
-    for (int i = 0; i < static_cast<int>(Finger::Count); i++) {
+Input GloveInput::update() {
+    Input state = Input::None;
+    for (int i = 0; i < NUM_INPUTS; i++) {
         finger_state[i] =
             touchRead(pins[i]) == 0 ? InputState::Active : InputState::Inactive;
+        if (finger_state[i] == InputState::Active) {
+            state = static_cast<Input>(i);
+        }
     }
+
+    return state;
 }
 
 InputState GloveInput::inputState(Input input) const {

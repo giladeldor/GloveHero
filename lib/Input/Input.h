@@ -3,12 +3,9 @@
 
 #include <Arduino.h>
 
-enum class Input {
-    Input1 = 0,
-    Input2,
-    Input3,
-    Input4,
-};
+#define NUM_INPUTS 4
+
+enum class Input { None = -1, Input1, Input2, Input3, Input4 };
 
 enum class InputState {
     Active,
@@ -19,31 +16,30 @@ class KeyboardInput {
 public:
     KeyboardInput();
 
-    void update();
+    Input update();
 
     InputState inputState(Input input) const;
 
 private:
-    enum class Key { H = 0, J, K, L, Count };
+    enum class Key { H = 0, J, K, L };
 
 private:
-    InputState key_state[static_cast<int>(Key::Count)]{};
+    InputState key_state[NUM_INPUTS];
 };
 
 class GloveInput {
 public:
     GloveInput(int pinky_pin, int ring_pin, int middle_pin, int index_pin);
 
-    void update();
+    Input update();
 
     InputState inputState(Input input) const;
 
 private:
-    enum class Finger { Pinky = 0, Ring, Middle, Index, Count };
+    enum class Finger { Pinky = 0, Ring, Middle, Index };
 
-    InputState finger_state[static_cast<int>(Finger::Count)]{};
-
-    int pins[static_cast<int>(Finger::Count)];
+    InputState finger_state[NUM_INPUTS];
+    int pins[NUM_INPUTS];
 };
 
 #endif /* _INPUT_H */
