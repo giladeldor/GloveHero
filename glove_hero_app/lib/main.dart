@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:glove_hero_app/pages/menu_page.dart';
+import 'package:glove_hero_app/utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'ble.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await Permission.bluetoothScan.request();
   await Permission.bluetoothConnect.request();
@@ -26,11 +30,13 @@ class GloveHeroApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Glove Hero',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const SafeArea(
+        child: HomePage(),
+      ),
     );
   }
 }
@@ -54,14 +60,7 @@ class HomePage extends StatelessWidget {
               break;
           }
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("BLE Test"),
-            ),
-            backgroundColor: Colors.white,
-            body: body,
-            floatingActionButton: _getFab(bleModel),
-          );
+          return const MenuPage();
         },
       );
 
