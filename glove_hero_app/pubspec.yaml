@@ -39,6 +39,7 @@ dependencies:
   flutter_reactive_ble: ^5.0.3
   permission_handler: ^10.2.0
   flutter_spinkit: ^5.2.0
+  tuple: ^2.0.1
 
 dev_dependencies:
   flutter_test:
