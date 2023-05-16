@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import '../utils.dart';
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
+
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
+  _MenuButtonID? _selectedButton;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,7 @@ class MenuPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Padding(
-              padding: EdgeInsets.only(top: 36.0, bottom: 16.0),
+              padding: EdgeInsets.only(top: 40.0, bottom: 16.0),
               child: Text(
                 "Glove Hero",
                 style: titleTextStyle,
@@ -30,34 +37,38 @@ class MenuPage extends StatelessWidget {
             Padding(
               padding: buttonPadding,
               child: _MenuButton(
-                title: "Single Player",
+                id: _MenuButtonID.singlePlayer,
                 onPressed: () {},
-                selected: true,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: _MenuButton(
-                title: "Multiplayer",
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: _MenuButton(
-                title: "Recording Mode",
+                selected: _selectedButton,
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _MenuButton(
-                title: "Leaderboard",
-                onPressed: () {},
+                id: _MenuButtonID.multiplayer,
+                selected: _selectedButton,
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: _MenuButton(
-                title: "Statistics",
+                id: _MenuButtonID.recordingMode,
+                selected: _selectedButton,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _MenuButton(
+                id: _MenuButtonID.leaderboard,
+                onPressed: () {},
+                selected: _selectedButton,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _MenuButton(
+                id: _MenuButtonID.statistics,
+                selected: _selectedButton,
               ),
             ),
           ],
@@ -71,38 +82,34 @@ class _MenuButton extends StatelessWidget {
   const _MenuButton({
     // ignore: unused_element
     super.key,
-    required this.title,
+    required this.id,
     this.onPressed,
-    this.selected = false,
+    this.selected,
   });
 
-  final String title;
+  final _MenuButtonID id;
   final void Function()? onPressed;
-  final bool selected;
+  final _MenuButtonID? selected;
 
   @override
   Widget build(BuildContext context) {
-    final color = onPressed == null
-        ? Colors.grey
-        : const Color.fromARGB(255, 242, 255, 235);
+    final style =
+        onPressed == null ? menuButtonDisabledTextStyle : menuButtonTextStyle;
 
     final label = FittedBox(
       child: Text(
-        title,
-        style: titleTextStyle.copyWith(
-          fontSize: 25,
-          color: color,
-        ),
+        id.name,
+        style: style,
       ),
     );
 
-    return selected
+    return selected == id
         ? OutlinedButton.icon(
             onPressed: onPressed,
-            icon: ImageIcon(
-              const AssetImage("assets/hand-selector.png"),
+            icon: const ImageIcon(
+              AssetImage("assets/hand-selector.png"),
               size: 30,
-              color: color,
+              color: Colors.white,
             ),
             label: label,
           )
@@ -111,4 +118,20 @@ class _MenuButton extends StatelessWidget {
             child: label,
           );
   }
+}
+
+enum _MenuButtonID {
+  singlePlayer,
+  multiplayer,
+  recordingMode,
+  leaderboard,
+  statistics;
+
+  String get name => switch (this) {
+        singlePlayer => "Single Player",
+        multiplayer => "Multiplayer",
+        recordingMode => "Recording Mode",
+        leaderboard => "Leaderboard",
+        statistics => "Statistics",
+      };
 }
