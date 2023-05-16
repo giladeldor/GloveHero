@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:glove_hero_app/utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'ble.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await Permission.bluetoothScan.request();
   await Permission.bluetoothConnect.request();
@@ -26,11 +29,13 @@ class GloveHeroApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Glove Hero',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const SafeArea(
+        child: HomePage(),
+      ),
     );
   }
 }
@@ -55,11 +60,16 @@ class HomePage extends StatelessWidget {
           }
 
           return Scaffold(
-            appBar: AppBar(
-              title: const Text("BLE Test"),
-            ),
             backgroundColor: Colors.white,
-            body: body,
+            body: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/menu-background.jpeg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: const MenuScreen(),
+            ),
             floatingActionButton: _getFab(bleModel),
           );
         },
@@ -88,6 +98,107 @@ class HomePage extends StatelessWidget {
       onPressed: onPressed,
       child: Icon(icon),
     );
+  }
+}
+
+class MenuScreen extends StatelessWidget {
+  const MenuScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const buttonPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 16);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 36.0, bottom: 16.0),
+          child: const Text(
+            "Glove Hero",
+            style: titleTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Padding(
+          padding: buttonPadding,
+          child: MenuButton(
+            title: "Single Player",
+            onPressed: () {},
+            selected: true,
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: MenuButton(
+            title: "Multiplayer",
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: MenuButton(
+            title: "Recording Mode",
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: MenuButton(
+            title: "Leaderboard",
+            onPressed: () {},
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: MenuButton(
+            title: "Statistics",
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class MenuButton extends StatelessWidget {
+  const MenuButton({
+    super.key,
+    required this.title,
+    this.onPressed,
+    this.selected = false,
+  });
+
+  final String title;
+  final void Function()? onPressed;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = onPressed == null
+        ? Colors.grey
+        : const Color.fromARGB(255, 242, 255, 235);
+
+    final label = FittedBox(
+      child: Text(
+        title,
+        style: titleTextStyle.copyWith(
+          fontSize: 25,
+          color: color,
+        ),
+      ),
+    );
+
+    return selected
+        ? OutlinedButton.icon(
+            onPressed: onPressed,
+            icon: ImageIcon(
+              AssetImage("assets/hand-selector.png"),
+              size: 30,
+              color: color,
+            ),
+            label: label,
+          )
+        : OutlinedButton(
+            onPressed: onPressed,
+            child: label,
+          );
   }
 }
 
