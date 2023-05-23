@@ -1,8 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'dart:ffi';
-import 'dart:io';
-
 class HighScore {
   String name = '';
   int score = -1;
