@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <=3.0.0"
+  sdk: ">=3.0.0 <=3.0.1"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -39,6 +39,7 @@ dependencies:
   permission_handler: ^10.2.0
   flutter_spinkit: ^5.2.0
   tuple: ^2.0.1
+  just_audio: ^0.9.33
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +65,7 @@ flutter:
   assets:
     - assets/menu-background.jpeg
     - assets/hand-selector.png
+    - assets/audio/
 
   fonts:
     - family: Karmatic
