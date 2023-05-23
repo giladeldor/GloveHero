@@ -14,9 +14,9 @@ class HighScore {
 }
 
 class Song {
-  List<Uint8> touches = List<Uint8>.empty();
+  List<int> touches = List<int>.empty();
   int currentTouch = -1;
-  late File songFile;
+  late String asset;
   var highScores = [
     HighScore(),
     HighScore(),
