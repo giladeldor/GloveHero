@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:glove_hero_app/ble.dart';
+import 'package:provider/provider.dart';
 import '../utils.dart';
 
 class MenuPage extends StatefulWidget {
@@ -10,6 +12,57 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   _MenuButtonID? _selectedButton;
+  Input _lastInput = Input.none;
+
+  void _handleUpdate(BleModel model) {
+    if (model.input != _lastInput) {
+      _lastInput = model.input;
+
+      if (_selectedButton == null) {
+        _selectedButton = _MenuButtonID.singlePlayer;
+      } else {
+        final action = _MenuAction.fromInput(_lastInput);
+        switch (action) {
+          case _MenuAction.up:
+            _selectedButton = _selectedButton?.up;
+            break;
+          case _MenuAction.down:
+            _selectedButton = _selectedButton?.down;
+            break;
+          case _MenuAction.select:
+            _handleSelect(_selectedButton);
+            break;
+          default:
+        }
+      }
+    }
+  }
+
+  void _handleSelect(_MenuButtonID? id) {
+    switch (id) {
+      case _MenuButtonID.singlePlayer:
+        print("Single player");
+        // Navigator.pushNamed(context, "/single-player");
+        break;
+      case _MenuButtonID.multiplayer:
+        print("Multiplayer");
+        // Navigator.pushNamed(context, "/multiplayer");
+        break;
+      case _MenuButtonID.recordingMode:
+        print("Recording mode");
+        // Navigator.pushNamed(context, "/recording-mode");
+        break;
+      case _MenuButtonID.leaderboard:
+        print("Leaderboard");
+        // Navigator.pushNamed(context, "/leaderboard");
+        break;
+      case _MenuButtonID.statistics:
+        print("Statistics");
+        // Navigator.pushNamed(context, "/statistics");
+        break;
+      default:
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,55 +76,89 @@ class _MenuPageState extends State<MenuPage> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 40.0, bottom: 16.0),
-              child: Text(
-                "Glove Hero",
-                style: titleTextStyle,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Padding(
-              padding: buttonPadding,
-              child: _MenuButton(
-                id: _MenuButtonID.singlePlayer,
-                onPressed: () {},
-                selected: _selectedButton,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _MenuButton(
-                id: _MenuButtonID.multiplayer,
-                selected: _selectedButton,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _MenuButton(
-                id: _MenuButtonID.recordingMode,
-                selected: _selectedButton,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _MenuButton(
-                id: _MenuButtonID.leaderboard,
-                onPressed: () {},
-                selected: _selectedButton,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _MenuButton(
-                id: _MenuButtonID.statistics,
-                selected: _selectedButton,
-              ),
-            ),
-          ],
+        child: Consumer<BleModel>(
+          builder: (context, model, child) {
+            _handleUpdate(model);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 40.0, bottom: 16.0),
+                  child: Text(
+                    "Glove Hero",
+                    style: titleTextStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: buttonPadding,
+                  child: _MenuButton(
+                    id: _MenuButtonID.singlePlayer,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.singlePlayer);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _MenuButton(
+                    id: _MenuButtonID.multiplayer,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.multiplayer);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _MenuButton(
+                    id: _MenuButtonID.recordingMode,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.recordingMode);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _MenuButton(
+                    id: _MenuButtonID.leaderboard,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.leaderboard);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _MenuButton(
+                    id: _MenuButtonID.statistics,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.statistics);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -134,4 +221,29 @@ enum _MenuButtonID {
         leaderboard => "Leaderboard",
         statistics => "Statistics",
       };
+
+  _MenuButtonID get up {
+    final idx = (index - 1) % _MenuButtonID.values.length;
+    return _MenuButtonID.values[idx];
+  }
+
+  _MenuButtonID get down {
+    final idx = (index + 1) % _MenuButtonID.values.length;
+    return _MenuButtonID.values[idx];
+  }
+}
+
+enum _MenuAction {
+  up,
+  down,
+  select;
+
+  static _MenuAction? fromInput(Input input) {
+    return switch (input) {
+      Input.input4 => up,
+      Input.input3 => down,
+      Input.input2 => select,
+      _ => null,
+    };
+  }
 }
