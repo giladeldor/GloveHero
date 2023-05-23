@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:glove_hero_app/song.dart';
+import 'package:just_audio/just_audio.dart';
 
 const titleTextStyle = TextStyle(
   fontFamily: "Karmatic",
@@ -17,3 +19,16 @@ const menuButtonDisabledTextStyle = TextStyle(
   fontSize: 30,
   color: Colors.grey,
 );
+
+class AudioManager {
+  final player = AudioPlayer();
+
+  void playSong(Song song) {
+    player.setAsset(song.asset);
+    player.play();
+  }
+
+  void pauseSong() {
+    player.pause();
+  }
+}
