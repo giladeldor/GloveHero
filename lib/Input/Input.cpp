@@ -1,53 +1,55 @@
 #include "Input.h"
 
 KeyboardInput::KeyboardInput() {
+    current = Input::None;
     for (size_t i = 0; i < NUM_INPUTS; i++) {
         key_state[i] = InputState::Inactive;
     }
 }
 
 Input KeyboardInput::update() {
-    Input state = Input::None;
-
     if (Serial.available()) {
         char c = Serial.read();
 
         switch (c) {
-            case 'h':
-                key_state[static_cast<int>(Key::H)] = InputState::Active;
-                state = Input::Input1;
+            case 'l':
+                key_state[static_cast<int>(Key::L)] = InputState::Active;
+                current = Input::Input1;
                 break;
-            case 'H':
-                key_state[static_cast<int>(Key::H)] = InputState::Inactive;
-                break;
-
-            case 'j':
-                key_state[static_cast<int>(Key::J)] = InputState::Active;
-                state = Input::Input2;
-                break;
-            case 'J':
-                key_state[static_cast<int>(Key::J)] = InputState::Inactive;
+            case 'L':
+                key_state[static_cast<int>(Key::L)] = InputState::Inactive;
+                current = Input::None;
                 break;
 
             case 'k':
                 key_state[static_cast<int>(Key::K)] = InputState::Active;
-                state = Input::Input3;
+                current = Input::Input2;
                 break;
             case 'K':
                 key_state[static_cast<int>(Key::K)] = InputState::Inactive;
+                current = Input::None;
                 break;
 
-            case 'l':
-                key_state[static_cast<int>(Key::L)] = InputState::Active;
-                state = Input::Input4;
+            case 'j':
+                key_state[static_cast<int>(Key::J)] = InputState::Active;
+                current = Input::Input3;
                 break;
-            case 'L':
-                key_state[static_cast<int>(Key::L)] = InputState::Inactive;
+            case 'J':
+                key_state[static_cast<int>(Key::J)] = InputState::Inactive;
+                current = Input::None;
+                break;
+
+            case 'h':
+                key_state[static_cast<int>(Key::H)] = InputState::Active;
+                current = Input::Input4;
+                break;
+            case 'H':
+                key_state[static_cast<int>(Key::H)] = InputState::Inactive;
+                current = Input::None;
                 break;
         }
-
-        return state;
     }
+    return current;
 }
 
 InputState KeyboardInput::inputState(Input input) const {

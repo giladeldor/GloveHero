@@ -21,10 +21,11 @@ public:
     InputState inputState(Input input) const;
 
 private:
-    enum class Key { H = 0, J, K, L };
+    enum class Key { L = 0, K, J, H };
 
 private:
     InputState key_state[NUM_INPUTS];
+    Input current;
 };
 
 class GloveInput {
