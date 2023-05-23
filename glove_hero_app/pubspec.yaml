@@ -67,7 +67,29 @@ flutter:
   assets:
     - assets/menu-background.jpeg
     - assets/hand-selector.png
+    - assets/audios/4-am.mp3
+    - assets/audios/all-my-life.mp3
+    - assets/audios/bad-guy.mp3
+    - assets/audios/come-as-you-are.mp3
+    - assets/audios/company-car.mp3
+    - assets/audios/freed-from-desire.mp3
+    - assets/audios/good-riddance.mp3
+    - assets/audios/in-the-end.mp3
+    - assets/audios/karma-police.mp3
     - assets/audios/mario.mp3
+    - assets/audios/mr-shoko.mp3
+    - assets/audios/my-love.mp3
+    - assets/audios/nothing-else-matters.mp3
+    - assets/audios/pokemon.mp3
+    - assets/audios/seven-nation-army.mp3
+    - assets/audios/slaves.mp3
+    - assets/audios/staireway-to-heaven.mp3
+    - assets/audios/staying-alive.mp3
+    - assets/audios/the-final-countdown.mp3
+    - assets/audios/toxic.mp3
+    - assets/audios/under-the-bridge.mp3
+    - assets/audios/yes-i-approached-ido.mp3
+    - assets/audios/yo-ya.mp3
 
   fonts:
     - family: Karmatic
