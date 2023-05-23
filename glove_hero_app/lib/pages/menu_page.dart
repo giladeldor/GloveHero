@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/ble.dart';
+import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
 import '../utils.dart';
 
@@ -15,6 +16,10 @@ class _MenuPageState extends State<MenuPage> {
   Input _lastInput = Input.none;
 
   void _handleUpdate(BleModel model) {
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
+      return;
+    }
+
     if (model.input != _lastInput) {
       _lastInput = model.input;
 
@@ -50,7 +55,14 @@ class _MenuPageState extends State<MenuPage> {
         break;
       case _MenuButtonID.recordingMode:
         print("Recording mode");
-        // Navigator.pushNamed(context, "/recording-mode");
+        Future.microtask(() {
+          _lastInput = Input.none;
+          return Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const RecordingModePage(),
+            ),
+          );
+        });
         break;
       case _MenuButtonID.leaderboard:
         print("Leaderboard");

@@ -167,7 +167,6 @@ class BleModel extends ChangeNotifier {
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
             assert(event.deviceId == device.id);
-            await _ble.clearGattCache(device.id);
 
             _touchCharacteristic = QualifiedCharacteristic(
               characteristicId: _touchCharacteristicUuid,
