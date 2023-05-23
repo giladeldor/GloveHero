@@ -70,6 +70,7 @@ flutter:
     - assets/audios/4-am.mp3
     - assets/audios/all-my-life.mp3
     - assets/audios/bad-guy.mp3
+    - assets/audios/bohemian-rhapsody.mp3
     - assets/audios/come-as-you-are.mp3
     - assets/audios/company-car.mp3
     - assets/audios/freed-from-desire.mp3
@@ -90,6 +91,7 @@ flutter:
     - assets/audios/under-the-bridge.mp3
     - assets/audios/yes-i-approached-ido.mp3
     - assets/audios/yo-ya.mp3
+    - assets/audios/you-give-love-a-bad-name.mp3
 
   fonts:
     - family: Karmatic
