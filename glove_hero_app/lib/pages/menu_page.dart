@@ -14,6 +14,56 @@ class _MenuPageState extends State<MenuPage> {
   _MenuButtonID? _selectedButton;
   Input _lastInput = Input.none;
 
+  void _handleUpdate(BleModel model) {
+    if (model.input != _lastInput) {
+      _lastInput = model.input;
+
+      if (_selectedButton == null) {
+        _selectedButton = _MenuButtonID.singlePlayer;
+      } else {
+        final action = _MenuAction.fromInput(_lastInput);
+        switch (action) {
+          case _MenuAction.up:
+            _selectedButton = _selectedButton?.up;
+            break;
+          case _MenuAction.down:
+            _selectedButton = _selectedButton?.down;
+            break;
+          case _MenuAction.select:
+            _handleSelect(_selectedButton);
+            break;
+          default:
+        }
+      }
+    }
+  }
+
+  void _handleSelect(_MenuButtonID? id) {
+    switch (id) {
+      case _MenuButtonID.singlePlayer:
+        print("Single player");
+        // Navigator.pushNamed(context, "/single-player");
+        break;
+      case _MenuButtonID.multiplayer:
+        print("Multiplayer");
+        // Navigator.pushNamed(context, "/multiplayer");
+        break;
+      case _MenuButtonID.recordingMode:
+        print("Recording mode");
+        // Navigator.pushNamed(context, "/recording-mode");
+        break;
+      case _MenuButtonID.leaderboard:
+        print("Leaderboard");
+        // Navigator.pushNamed(context, "/leaderboard");
+        break;
+      case _MenuButtonID.statistics:
+        print("Statistics");
+        // Navigator.pushNamed(context, "/statistics");
+        break;
+      default:
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const buttonPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 0);
@@ -28,25 +78,7 @@ class _MenuPageState extends State<MenuPage> {
         ),
         child: Consumer<BleModel>(
           builder: (context, model, child) {
-            print(model.connectionState);
-            if (model.input != _lastInput) {
-              _lastInput = model.input;
-
-              if (_selectedButton == null) {
-                _selectedButton = _MenuButtonID.singlePlayer;
-              } else {
-                final action = _MenuAction.fromInput(_lastInput);
-                switch (action) {
-                  case _MenuAction.up:
-                    _selectedButton = _selectedButton?.up;
-                    break;
-                  case _MenuAction.down:
-                    _selectedButton = _selectedButton?.down;
-                    break;
-                  default:
-                }
-              }
-            }
+            _handleUpdate(model);
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -63,7 +95,12 @@ class _MenuPageState extends State<MenuPage> {
                   padding: buttonPadding,
                   child: _MenuButton(
                     id: _MenuButtonID.singlePlayer,
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.singlePlayer);
+                    },
                     selected: _selectedButton,
                   ),
                 ),
@@ -71,6 +108,12 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.multiplayer,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.multiplayer);
+                    },
                     selected: _selectedButton,
                   ),
                 ),
@@ -78,6 +121,12 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.recordingMode,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.recordingMode);
+                    },
                     selected: _selectedButton,
                   ),
                 ),
@@ -85,7 +134,12 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.leaderboard,
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.leaderboard);
+                    },
                     selected: _selectedButton,
                   ),
                 ),
@@ -93,6 +147,12 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.statistics,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.statistics);
+                    },
                     selected: _selectedButton,
                   ),
                 ),
