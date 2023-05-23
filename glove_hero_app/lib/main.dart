@@ -15,6 +15,8 @@ void main() async {
   await Permission.bluetoothConnect.request();
 
   final bleModel = BleModel();
+  // TODO: Create a system for connecting / disconnecting and handling failures.
+  bleModel.connect();
 
   runApp(
     ChangeNotifierProvider(
@@ -124,7 +126,7 @@ class ConnectedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Consumer<BleModel>(
         builder: (context, bleModel, child) {
-          final text = "Value:    ${bleModel.idxValue}";
+          final text = "Value:    ${bleModel.input}";
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,

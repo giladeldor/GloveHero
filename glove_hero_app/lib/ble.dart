@@ -23,35 +23,21 @@ enum Input {
   /// Index finger
   input4;
 
-  factory Input.fromIdx(int idx) {
-    switch (idx) {
-      case 1:
-        return Input.input1;
-      case 2:
-        return Input.input2;
-      case 3:
-        return Input.input3;
-      case 4:
-        return Input.input4;
-      default:
-        return Input.none;
-    }
-  }
+  factory Input.fromIdx(int idx) => switch (idx) {
+        0 => Input.input1,
+        1 => Input.input2,
+        2 => Input.input3,
+        3 => Input.input4,
+        _ => Input.none
+      };
 
-  int get idx {
-    switch (this) {
-      case Input.none:
-        return 0;
-      case Input.input1:
-        return 1;
-      case Input.input2:
-        return 2;
-      case Input.input3:
-        return 3;
-      case Input.input4:
-        return 4;
-    }
-  }
+  int get idx => switch (this) {
+        Input.none => -1,
+        Input.input1 => 0,
+        Input.input2 => 1,
+        Input.input3 => 2,
+        Input.input4 => 3
+      };
 }
 
 class BleModel extends ChangeNotifier {
@@ -87,7 +73,7 @@ class BleModel extends ChangeNotifier {
   QualifiedCharacteristic? _touchCharacteristic;
   Input __touchValue = Input.none;
 
-  Input get idxValue => __touchValue;
+  Input get input => __touchValue;
 
   set _touchValue(Input value) {
     if (value == __touchValue) {
@@ -165,6 +151,8 @@ class BleModel extends ChangeNotifier {
   }
 
   void connect() async {
+    if (connectionState != BleConnectionState.disconnected) return;
+
     _connectionState = BleConnectionState.connecting;
     await for (final device in _ble.scanForDevices(
       withServices: [],
@@ -179,6 +167,7 @@ class BleModel extends ChangeNotifier {
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
             assert(event.deviceId == device.id);
+            await _ble.clearGattCache(device.id);
 
             _touchCharacteristic = QualifiedCharacteristic(
               characteristicId: _touchCharacteristicUuid,
@@ -217,6 +206,7 @@ class BleModel extends ChangeNotifier {
             _ringColor = await _getColorValue(_ringLedCharacteristic);
             _middleColor = await _getColorValue(_middleLedCharacteristic);
             _indexColor = await _getColorValue(_indexLedCharacteristic);
+
             _connectionState = BleConnectionState.connected;
             break;
 
