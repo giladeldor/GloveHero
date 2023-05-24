@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:glove_hero_app/pages/menu_page.dart';
-import 'package:glove_hero_app/utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'ble.dart';
+import 'pages/menu_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
