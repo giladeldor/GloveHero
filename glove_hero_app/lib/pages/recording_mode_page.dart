@@ -161,6 +161,11 @@ class SongCard extends StatelessWidget {
           onPressed: onPressed,
         ),
         SongCard(
+          songName: "Sultans of\nSwing",
+          songArtPath: "assets/song-art/sultans-of-swing.jpg",
+          onPressed: onPressed,
+        ),
+        SongCard(
           songName: "The Final\nCountdown",
           songArtPath: "assets/song-art/the-final-countdown.jpg",
           onPressed: onPressed,
