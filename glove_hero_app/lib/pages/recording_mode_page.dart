@@ -14,6 +14,8 @@ class _RecordingModePageState extends State<RecordingModePage> {
 
   @override
   Widget build(BuildContext context) {
+    AudioManager audioManager = AudioManager();
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -27,6 +29,7 @@ class _RecordingModePageState extends State<RecordingModePage> {
           child: CarouselSlider(
             items: SongCard.songs(() {
               print("TEST");
+              audioManager.playClip(1);
               _carouselController.nextPage();
             }),
             carouselController: _carouselController,
