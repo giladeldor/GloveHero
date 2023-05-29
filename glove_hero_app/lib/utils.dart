@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/song.dart';
 import 'package:just_audio/just_audio.dart';
@@ -22,7 +24,7 @@ const menuButtonDisabledTextStyle = TextStyle(
 
 class AudioManager {
   final player = AudioPlayer();
-  int currentPage = 0;
+  int currentPlay = 0;
   List<Song> songs = [
     Song("assets/audio/4-am.mp3", 0, 15),
     Song("assets/audio/all-my-life.mp3", 6, 17),
@@ -61,16 +63,24 @@ class AudioManager {
     player.pause();
   }
 
-  void playClip(int toAdd) async {
+  void playClip(int index) async {
     player.stop();
-    currentPage = currentPage += toAdd;
-    currentPage = currentPage % 26;
-    print(currentPage);
-    Song song = songs[currentPage];
+    print(index);
+    Song song = songs[index];
+    currentPlay++;
+    if (currentPlay < 0)
+    {
+      currentPlay = 1;
+    }
+    int thisPlay = currentPlay;
     player.setAsset(song.asset);
     player.seek(Duration(seconds: song.clipStart));
     player.play();
+    
     await Future.delayed(Duration(seconds: song.clipEnd - song.clipStart));
-    player.stop();
+    if (thisPlay == currentPlay)
+    {
+      player.stop();
+    }
   }
 }

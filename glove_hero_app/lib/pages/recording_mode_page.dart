@@ -11,10 +11,10 @@ class RecordingModePage extends StatefulWidget {
 
 class _RecordingModePageState extends State<RecordingModePage> {
   final CarouselController _carouselController = CarouselController();
+  AudioManager audioManager = AudioManager();
 
   @override
   Widget build(BuildContext context) {
-    AudioManager audioManager = AudioManager();
 
     return Scaffold(
       body: Container(
@@ -29,7 +29,6 @@ class _RecordingModePageState extends State<RecordingModePage> {
           child: CarouselSlider(
             items: SongCard.songs(() {
               print("TEST");
-              audioManager.playClip(1);
               _carouselController.nextPage();
             }),
             carouselController: _carouselController,
@@ -42,11 +41,16 @@ class _RecordingModePageState extends State<RecordingModePage> {
               reverse: false,
               enlargeCenterPage: true,
               scrollDirection: Axis.horizontal,
+              onPageChanged: onPageChange,
             ),
           ),
         ),
       ),
     );
+  }
+
+  onPageChange(int index, CarouselPageChangedReason reason) {
+    audioManager.playClip(index);
   }
 }
 
