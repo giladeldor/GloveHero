@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
-import '../models/utils.dart';
+import '../styles.dart';
 import 'leaderboard_page.dart';
 
 class MenuPage extends StatefulWidget {

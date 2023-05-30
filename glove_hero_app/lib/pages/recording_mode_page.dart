@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:glove_hero_app/models/utils.dart';
+import '../models/audio_manager.dart';
 import '../widgets/song_card.dart';
 
 class RecordingModePage extends StatefulWidget {
