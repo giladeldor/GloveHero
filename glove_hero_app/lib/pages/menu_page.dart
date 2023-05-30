@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
+import '../models/menu_action.dart';
 import '../styles.dart';
 import 'leaderboard_page.dart';
 
@@ -13,6 +14,7 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
+  late BleInput _input;
   _MenuButtonID? _selectedButton;
 
   void _handleInput(Input input) {
@@ -23,15 +25,15 @@ class _MenuPageState extends State<MenuPage> {
     if (_selectedButton == null) {
       _selectedButton = _MenuButtonID.singlePlayer;
     } else {
-      final action = _MenuAction.fromInput(input);
+      final action = MenuAction.fromInput(input);
       switch (action) {
-        case _MenuAction.up:
+        case MenuAction.up:
           _selectedButton = _selectedButton?.up;
           break;
-        case _MenuAction.down:
+        case MenuAction.down:
           _selectedButton = _selectedButton?.down;
           break;
-        case _MenuAction.select:
+        case MenuAction.select:
           _handleSelect(_selectedButton);
           break;
         default:
@@ -59,13 +61,11 @@ class _MenuPageState extends State<MenuPage> {
         });
         break;
       case _MenuButtonID.leaderboard:
-        Future.microtask(() {
-          return Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const LeaderboardPage(),
-            ),
-          );
-        });
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const LeaderboardPage(),
+          ),
+        );
         break;
       case _MenuButtonID.statistics:
         // Navigator.pushNamed(context, "/statistics");
@@ -82,8 +82,8 @@ class _MenuPageState extends State<MenuPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final input = context.read<BleInput>();
-      input.addTouchListener(_handleInput);
+      _input = context.read<BleInput>();
+      _input.addTouchListener(_handleInput);
     });
   }
 
@@ -203,6 +203,13 @@ class _MenuPageState extends State<MenuPage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _input.removeTouchListener(_handleInput);
+  }
 }
 
 class _MenuButton extends StatelessWidget {
@@ -272,20 +279,5 @@ enum _MenuButtonID {
   _MenuButtonID get down {
     final idx = (index + 1) % _MenuButtonID.values.length;
     return _MenuButtonID.values[idx];
-  }
-}
-
-enum _MenuAction {
-  up,
-  down,
-  select;
-
-  static _MenuAction? fromInput(Input input) {
-    return switch (input) {
-      Input.input4 => up,
-      Input.input3 => down,
-      Input.input2 => select,
-      _ => null,
-    };
   }
 }

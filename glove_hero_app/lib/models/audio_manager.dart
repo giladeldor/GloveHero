@@ -30,4 +30,8 @@ class AudioManager {
       },
     );
   }
+
+  void dispose() {
+    player.dispose();
+  }
 }
