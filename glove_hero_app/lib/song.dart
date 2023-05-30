@@ -12,6 +12,8 @@ class Song {
   List<int> touches = List<int>.empty();
   int currentTouch = -1;
   late String asset;
+  late int clipStart;
+  late int clipEnd;
   var highScores = [
     HighScore(),
     HighScore(),
@@ -24,4 +26,6 @@ class Song {
     HighScore(),
     HighScore(),
   ];
+
+  Song(this.asset, this.clipStart, this.clipEnd);
 }

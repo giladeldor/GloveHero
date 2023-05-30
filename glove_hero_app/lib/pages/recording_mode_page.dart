@@ -11,9 +11,11 @@ class RecordingModePage extends StatefulWidget {
 
 class _RecordingModePageState extends State<RecordingModePage> {
   final CarouselController _carouselController = CarouselController();
+  AudioManager audioManager = AudioManager();
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -39,11 +41,16 @@ class _RecordingModePageState extends State<RecordingModePage> {
               reverse: false,
               enlargeCenterPage: true,
               scrollDirection: Axis.horizontal,
+              onPageChanged: onPageChange,
             ),
           ),
         ),
       ),
     );
+  }
+
+  onPageChange(int index, CarouselPageChangedReason reason) {
+    audioManager.playClip(index);
   }
 }
 
@@ -158,6 +165,11 @@ class SongCard extends StatelessWidget {
         SongCard(
           songName: "Staying Alive",
           songArtPath: "assets/song-art/staying-alive.jpg",
+          onPressed: onPressed,
+        ),
+        SongCard(
+          songName: "Sultans of\nSwing",
+          songArtPath: "assets/song-art/sultans-of-swing.jpg",
           onPressed: onPressed,
         ),
         SongCard(
