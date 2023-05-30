@@ -72,6 +72,10 @@ class _MenuPageState extends State<MenuPage> {
         print("Statistics");
         // Navigator.pushNamed(context, "/statistics");
         break;
+      case _MenuButtonID.controls:
+        print("Controls");
+        // Navigator.pushNamed(context, "/controls");
+        break;
       default:
     }
   }
@@ -168,6 +172,19 @@ class _MenuPageState extends State<MenuPage> {
                     selected: _selectedButton,
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _MenuButton(
+                    id: _MenuButtonID.controls,
+                    onPressed: () {
+                      setState(() {
+                        _selectedButton = null;
+                      });
+                      _handleSelect(_MenuButtonID.controls);
+                    },
+                    selected: _selectedButton,
+                  ),
+                ),
               ],
             );
           },
@@ -224,7 +241,8 @@ enum _MenuButtonID {
   multiplayer,
   recordingMode,
   leaderboard,
-  statistics;
+  statistics,
+  controls;
 
   String get name => switch (this) {
         singlePlayer => "Single Player",
@@ -232,6 +250,7 @@ enum _MenuButtonID {
         recordingMode => "Recording Mode",
         leaderboard => "Leaderboard",
         statistics => "Statistics",
+        controls => "Controls"
       };
 
   _MenuButtonID get up {
