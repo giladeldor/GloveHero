@@ -141,7 +141,7 @@ class SongCard extends StatelessWidget {
         ),
       ];
 
-      @override
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed,

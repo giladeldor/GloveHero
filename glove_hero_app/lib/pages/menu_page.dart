@@ -72,8 +72,8 @@ class _MenuPageState extends State<MenuPage> {
           return Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const LeaderboardPage(),
-              ),
-            );
+            ),
+          );
         });
         break;
       case _MenuButtonID.statistics:
