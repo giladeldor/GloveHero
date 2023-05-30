@@ -40,7 +40,7 @@ enum Input {
       };
 }
 
-class BleModel extends ChangeNotifier {
+class BleModel {
   static final Uuid _serviceUuid =
       Uuid.parse("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
   static final Uuid _touchCharacteristicUuid =
@@ -55,89 +55,53 @@ class BleModel extends ChangeNotifier {
       Uuid.parse("e6297d4b-cfb8-4a9a-a650-3ce33b9cbef0");
 
   final _ble = FlutterReactiveBle();
-
   StreamSubscription<ConnectionStateUpdate>? _connectionStream;
 
-  BleConnectionState __connectionState = BleConnectionState.disconnected;
-  BleConnectionState get connectionState => __connectionState;
-
-  set _connectionState(BleConnectionState state) {
-    if (state == __connectionState) {
-      return;
-    }
-
-    __connectionState = state;
-    notifyListeners();
-  }
-
   QualifiedCharacteristic? _touchCharacteristic;
-  Input __touchValue = Input.none;
-
-  Input get input => __touchValue;
-
-  set _touchValue(Input value) {
-    if (value == __touchValue) {
-      return;
-    }
-
-    __touchValue = value;
-    notifyListeners();
-  }
 
   QualifiedCharacteristic? _pinkyLedCharacteristic;
+  QualifiedCharacteristic? _ringLedCharacteristic;
+  QualifiedCharacteristic? _middleLedCharacteristic;
+  QualifiedCharacteristic? _indexLedCharacteristic;
+
   Color? _pinkyColor;
-
   Color get pinkyColor => _pinkyColor!;
-
   set pinkyColor(Color value) {
     _pinkyColor = value;
     _ble.writeCharacteristicWithResponse(
       _pinkyLedCharacteristic!,
       value: [pinkyColor.red, pinkyColor.green, pinkyColor.blue],
     );
-    notifyListeners();
   }
 
-  QualifiedCharacteristic? _ringLedCharacteristic;
   Color? _ringColor;
-
   Color get ringColor => _ringColor!;
-
   set ringColor(Color value) {
     _ringColor = value;
     _ble.writeCharacteristicWithResponse(
       _ringLedCharacteristic!,
       value: [ringColor.red, ringColor.green, ringColor.blue],
     );
-    notifyListeners();
   }
 
-  QualifiedCharacteristic? _middleLedCharacteristic;
   Color? _middleColor;
-
   Color get middleColor => _middleColor!;
-
   set middleColor(Color value) {
     _middleColor = value;
     _ble.writeCharacteristicWithResponse(
       _middleLedCharacteristic!,
       value: [middleColor.red, middleColor.green, middleColor.blue],
     );
-    notifyListeners();
   }
 
-  QualifiedCharacteristic? _indexLedCharacteristic;
   Color? _indexColor;
-
   Color get indexColor => _indexColor!;
-
   set indexColor(Color value) {
     _indexColor = value;
     _ble.writeCharacteristicWithResponse(
       _indexLedCharacteristic!,
       value: [indexColor.red, indexColor.green, indexColor.blue],
     );
-    notifyListeners();
   }
 
   Future<Color> _getColorValue(QualifiedCharacteristic? characteristic) async {
@@ -150,10 +114,13 @@ class BleModel extends ChangeNotifier {
     );
   }
 
-  void connect() async {
-    if (connectionState != BleConnectionState.disconnected) return;
+  final BleConnection connection = BleConnection();
+  final BleInput input = BleInput();
 
-    _connectionState = BleConnectionState.connecting;
+  void connect() async {
+    if (connection.state != BleConnectionState.disconnected) return;
+
+    connection.state = BleConnectionState.connecting;
     await for (final device in _ble.scanForDevices(
       withServices: [],
       scanMode: ScanMode.lowLatency,
@@ -196,7 +163,7 @@ class BleModel extends ChangeNotifier {
 
             _ble.subscribeToCharacteristic(_touchCharacteristic!).listen(
               (data) {
-                _touchValue = Input.fromIdx(data.first);
+                input._value = Input.fromIdx(data.first);
               },
             );
 
@@ -206,7 +173,7 @@ class BleModel extends ChangeNotifier {
             _middleColor = await _getColorValue(_middleLedCharacteristic);
             _indexColor = await _getColorValue(_indexLedCharacteristic);
 
-            _connectionState = BleConnectionState.connected;
+            connection.state = BleConnectionState.connected;
             break;
 
           default:
@@ -218,13 +185,49 @@ class BleModel extends ChangeNotifier {
 
   void disconnect() async {
     await _connectionStream?.cancel();
-    _connectionState = BleConnectionState.disconnected;
-    _touchValue = Input.none;
+    connection.state = BleConnectionState.disconnected;
+    input._value = Input.none;
   }
 
-  @override
   void dispose() {
-    super.dispose();
     _connectionStream?.cancel();
+  }
+}
+
+class BleConnection extends ChangeNotifier {
+  BleConnectionState _state = BleConnectionState.disconnected;
+
+  BleConnectionState get state => _state;
+
+  set state(BleConnectionState value) {
+    if (value == _state) {
+      return;
+    }
+
+    _state = value;
+    notifyListeners();
+  }
+}
+
+class BleInput extends ChangeNotifier {
+  Input __value = Input.none;
+
+  Input get value => __value;
+
+  set _value(Input value) {
+    if (value == __value) {
+      return;
+    }
+
+    __value = value;
+    notifyListeners();
+  }
+
+  void addTouchListener(void Function(Input) callback) {
+    addListener(() {
+      if (value == Input.none) return;
+
+      callback(value);
+    });
   }
 }

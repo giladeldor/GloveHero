@@ -14,50 +14,43 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   _MenuButtonID? _selectedButton;
-  Input _lastInput = Input.none;
 
-  void _handleUpdate(BleModel model) {
+  void _handleInput(Input input) {
     if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
 
-    if (model.input != _lastInput) {
-      _lastInput = model.input;
-
-      if (_selectedButton == null) {
-        _selectedButton = _MenuButtonID.singlePlayer;
-      } else {
-        final action = _MenuAction.fromInput(_lastInput);
-        switch (action) {
-          case _MenuAction.up:
-            _selectedButton = _selectedButton?.up;
-            break;
-          case _MenuAction.down:
-            _selectedButton = _selectedButton?.down;
-            break;
-          case _MenuAction.select:
-            _handleSelect(_selectedButton);
-            break;
-          default:
-        }
+    if (_selectedButton == null) {
+      _selectedButton = _MenuButtonID.singlePlayer;
+    } else {
+      final action = _MenuAction.fromInput(input);
+      switch (action) {
+        case _MenuAction.up:
+          _selectedButton = _selectedButton?.up;
+          break;
+        case _MenuAction.down:
+          _selectedButton = _selectedButton?.down;
+          break;
+        case _MenuAction.select:
+          _handleSelect(_selectedButton);
+          break;
+        default:
       }
     }
+
+    setState(() {});
   }
 
   void _handleSelect(_MenuButtonID? id) {
     switch (id) {
       case _MenuButtonID.singlePlayer:
-        print("Single player");
         // Navigator.pushNamed(context, "/single-player");
         break;
       case _MenuButtonID.multiplayer:
-        print("Multiplayer");
         // Navigator.pushNamed(context, "/multiplayer");
         break;
       case _MenuButtonID.recordingMode:
-        print("Recording mode");
         Future.microtask(() {
-          _lastInput = Input.none;
           return Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const RecordingModePage(),
@@ -66,9 +59,7 @@ class _MenuPageState extends State<MenuPage> {
         });
         break;
       case _MenuButtonID.leaderboard:
-        print("Leaderboard");
         Future.microtask(() {
-          _lastInput = Input.none;
           return Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const LeaderboardPage(),
@@ -77,15 +68,23 @@ class _MenuPageState extends State<MenuPage> {
         });
         break;
       case _MenuButtonID.statistics:
-        print("Statistics");
         // Navigator.pushNamed(context, "/statistics");
         break;
       case _MenuButtonID.controls:
-        print("Controls");
         // Navigator.pushNamed(context, "/controls");
         break;
       default:
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final input = context.read<BleInput>();
+      input.addTouchListener(_handleInput);
+    });
   }
 
   @override
@@ -100,10 +99,8 @@ class _MenuPageState extends State<MenuPage> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Consumer<BleModel>(
-          builder: (context, model, child) {
-            _handleUpdate(model);
-
+        child: Consumer<BleConnection>(
+          builder: (context, connection, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -119,12 +116,14 @@ class _MenuPageState extends State<MenuPage> {
                   padding: buttonPadding,
                   child: _MenuButton(
                     id: _MenuButtonID.singlePlayer,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.singlePlayer);
-                    },
+                    onPressed: connection.state == BleConnectionState.connected
+                        ? () {
+                            setState(() {
+                              _selectedButton = null;
+                            });
+                            _handleSelect(_MenuButtonID.singlePlayer);
+                          }
+                        : null,
                     selected: _selectedButton,
                   ),
                 ),
@@ -132,12 +131,14 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.multiplayer,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.multiplayer);
-                    },
+                    onPressed: connection.state == BleConnectionState.connected
+                        ? () {
+                            setState(() {
+                              _selectedButton = null;
+                            });
+                            _handleSelect(_MenuButtonID.multiplayer);
+                          }
+                        : null,
                     selected: _selectedButton,
                   ),
                 ),
@@ -145,12 +146,14 @@ class _MenuPageState extends State<MenuPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
                     id: _MenuButtonID.recordingMode,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.recordingMode);
-                    },
+                    onPressed: connection.state == BleConnectionState.connected
+                        ? () {
+                            setState(() {
+                              _selectedButton = null;
+                            });
+                            _handleSelect(_MenuButtonID.recordingMode);
+                          }
+                        : null,
                     selected: _selectedButton,
                   ),
                 ),
