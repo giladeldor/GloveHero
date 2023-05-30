@@ -1,5 +1,5 @@
 class HighScore {
-  String name = '';
+  String name = 'NO HIGH SCORE';
   int score = -1;
 
   setHighScore(String name, int score) {

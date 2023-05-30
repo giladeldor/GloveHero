@@ -68,6 +68,7 @@ flutter:
     - assets/hand-selector.png
     - assets/recording-page-background.jpeg
     - assets/menu-background.jpeg
+    - assets/leaderboard-menu-background.jpg
 
   fonts:
     - family: Karmatic

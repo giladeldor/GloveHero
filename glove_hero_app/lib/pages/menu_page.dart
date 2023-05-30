@@ -3,6 +3,7 @@ import 'package:glove_hero_app/ble.dart';
 import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
 import '../utils.dart';
+import 'leaderboard_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -66,7 +67,14 @@ class _MenuPageState extends State<MenuPage> {
         break;
       case _MenuButtonID.leaderboard:
         print("Leaderboard");
-        // Navigator.pushNamed(context, "/leaderboard");
+        Future.microtask(() {
+          _lastInput = Input.none;
+          return Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const LeaderboardPage(),
+            ),
+          );
+        });
         break;
       case _MenuButtonID.statistics:
         print("Statistics");
