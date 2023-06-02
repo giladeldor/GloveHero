@@ -1,11 +1,18 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum BleConnectionState {
   disconnected,
   connecting,
   connected,
+}
+
+enum BleState {
+  on,
+  bluetoothPermissionDenied,
+  bluetoothDisabled,
 }
 
 enum Input {
@@ -114,15 +121,38 @@ class BleModel {
     );
   }
 
+  Future<bool> _requestBluetoothPermission() async {
+    final bluetoothScanPermission = await Permission.bluetoothScan.request();
+    final bluetoothConnectPermission =
+        await Permission.bluetoothConnect.request();
+
+    return bluetoothScanPermission.isDenied ||
+        bluetoothConnectPermission.isDenied;
+  }
+
   final BleConnection connection = BleConnection();
   final BleInput input = BleInput();
+  Future<BleState> get state async {
+    if (!await _requestBluetoothPermission()) {
+      return BleState.bluetoothPermissionDenied;
+    }
 
-  void connect() async {
-    if (connection.state != BleConnectionState.disconnected) return;
+    if (_ble.status != BleStatus.ready) {
+      return BleState.bluetoothDisabled;
+    }
+
+    return BleState.on;
+  }
+
+  Future<void> connect() async {
+    if (await state != BleState.on ||
+        connection.state != BleConnectionState.disconnected) {
+      return;
+    }
 
     connection.state = BleConnectionState.connecting;
     await for (final device in _ble.scanForDevices(
-      withServices: [],
+      withServices: [_serviceUuid],
       scanMode: ScanMode.lowLatency,
     )) {
       if (device.name != "GloveHero") {
@@ -183,7 +213,7 @@ class BleModel {
     }
   }
 
-  void disconnect() async {
+  Future<void> disconnect() async {
     await _connectionStream?.cancel();
     connection.state = BleConnectionState.disconnected;
     input._value = Input.none;
