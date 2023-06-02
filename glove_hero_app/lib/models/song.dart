@@ -1,3 +1,5 @@
+import 'high_score.dart';
+
 class Song {
   const Song({
     required this.name,
@@ -172,17 +174,13 @@ class SongManager {
     ),
   ];
 
-  static List<HighScore> getHighScores(songIndex) {
-    return List.empty();
-  }
-}
+  static final Map<String, SongHighScores> _highScores =
+      false ? /* Try loading json from file*/ {} : {};
 
-class HighScore {
-  String name = 'NO HIGH SCORE';
-  int score = -1;
-
-  setHighScore(String name, int score) {
-    this.name = name;
-    this.score = score;
+  static SongHighScores getHighScores(Song song) {
+    if (!_highScores.containsKey(song.name)) {
+      _highScores[song.name] = SongHighScores();
+    }
+    return _highScores[song.name]!;
   }
 }

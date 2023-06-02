@@ -13,7 +13,7 @@ class LeaderboardPage extends StatefulWidget {
 
 class _LeaderboardPageState extends State<LeaderboardPage> {
   final CarouselController _carouselController = CarouselController();
-  List<HighScore> _highScores = SongManager.getHighScores(0);
+  var _highScores = SongManager.getHighScores(SongManager.songs[0]);
 
   @override
   Widget build(BuildContext context) {
@@ -26,89 +26,57 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           ),
         ),
         child: Column(children: [
-          Padding(
-              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
-              child: Align(
-                alignment: Alignment.center,
-                child: CarouselSlider(
-                  items: SongCard.songs(() {
-                    print("TEST");
-                    _carouselController.nextPage();
-                  }),
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    height: 400,
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 0.8,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    enlargeCenterPage: true,
-                    scrollDirection: Axis.horizontal,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _highScores = SongManager.getHighScores(index);
-                      });
-                    },
-                  ),
-                ),
-              )),
           const Padding(
-              padding: EdgeInsets.symmetric(vertical: 7, horizontal: 0),
-              child: FittedBox(
-                  child: Text(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            child: FittedBox(
+              child: Text(
                 "Leaderboard",
                 style: titleTextStyle,
                 textAlign: TextAlign.center,
-              ))),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
+            child: Align(
+              alignment: Alignment.center,
+              child: CarouselSlider(
+                items: SongCard.songs(() {
+                  _carouselController.nextPage();
+                }),
+                carouselController: _carouselController,
+                options: CarouselOptions(
+                  height: 400,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.8,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  enlargeCenterPage: true,
+                  scrollDirection: Axis.horizontal,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _highScores =
+                          SongManager.getHighScores(SongManager.songs[index]);
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
               child: Table(
-                border: TableBorder.all(
-                    color: const Color.fromARGB(255, 0, 0, 0), width: 1.5),
-                children: [
-                  TableRow(children: [
-                    Center(child: Text(_highScores[0].name)),
-                    Center(child: Text(castHighScore(_highScores[0].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[1].name)),
-                    Center(child: Text(castHighScore(_highScores[1].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[2].name)),
-                    Center(child: Text(castHighScore(_highScores[2].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[3].name)),
-                    Center(child: Text(castHighScore(_highScores[3].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[4].name)),
-                    Center(child: Text(castHighScore(_highScores[4].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[5].name)),
-                    Center(child: Text(castHighScore(_highScores[5].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[6].name)),
-                    Center(child: Text(castHighScore(_highScores[6].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[7].name)),
-                    Center(child: Text(castHighScore(_highScores[7].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[8].name)),
-                    Center(child: Text(castHighScore(_highScores[8].score))),
-                  ]),
-                  TableRow(children: [
-                    Center(child: Text(_highScores[9].name)),
-                    Center(child: Text(castHighScore(_highScores[9].score))),
-                  ])
-                ],
-              ))
+                  border: TableBorder.all(
+                      color: const Color.fromARGB(255, 0, 0, 0), width: 1.5),
+                  children: _highScores.scores
+                      .map(
+                        (score) => TableRow(children: [
+                          Center(child: Text(score.name)),
+                          Center(child: Text(castHighScore(score.score))),
+                        ]),
+                      )
+                      .toList()))
         ]),
       ),
     );
