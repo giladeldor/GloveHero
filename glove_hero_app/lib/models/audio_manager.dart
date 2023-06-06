@@ -2,36 +2,45 @@ import 'package:just_audio/just_audio.dart';
 import 'song.dart';
 
 class AudioManager {
-  final player = AudioPlayer();
-  int currentPlay = 0;
-  Future _playOperation = Future.value(null);
+  static final _player = AudioPlayer();
+  static Future _playOperation = Future.value(null);
 
-  /*void playSong()jkjk {
-    player.setAsset(song.asset);
-    player.play();
-  }*/
+  static int get position {
+    if (_player.playing) return -1;
 
-  void pauseSong() {
-    player.pause();
+    return _player.position.inMilliseconds;
   }
 
-  void playClip(int index) async {
+  static void playSong(Song song) {
+    _player.setAsset(song.audioAsset);
+    _player.play();
+  }
+
+  static void stopSong() {
+    _player.stop();
+  }
+
+  static void pauseSong() {
+    _player.pause();
+  }
+
+  static void playClip(int index) async {
     _playOperation = _playOperation.then(
       (_) async {
-        await player.stop();
+        await _player.stop();
 
         Song song = SongManager.songs[index];
-        await player.setVolume(song.volume);
-        await player.setAsset(song.audioAsset);
-        await player.setClip(
+        await _player.setVolume(song.volume);
+        await _player.setAsset(song.audioAsset);
+        await _player.setClip(
             start: Duration(seconds: song.previewSpan.start),
             end: Duration(seconds: song.previewSpan.end));
-        player.play();
+        _player.play();
       },
     );
   }
 
-  void dispose() {
-    player.dispose();
+  static void dispose() {
+    _player.dispose();
   }
 }

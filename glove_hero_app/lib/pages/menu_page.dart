@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
+import 'package:glove_hero_app/pages/recording_mode_menu_page.dart';
 import 'package:provider/provider.dart';
-import '../models/menu_action.dart';
+import '../models/controller_action.dart';
 import '../styles.dart';
 import 'leaderboard_page.dart';
 
@@ -55,7 +55,7 @@ class _MenuPageState extends State<MenuPage> {
         Future.microtask(() {
           return Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const RecordingModePage(),
+              builder: (context) => const RecordingModeMenuPage(),
             ),
           );
         });

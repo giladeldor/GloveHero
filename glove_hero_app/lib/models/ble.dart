@@ -247,7 +247,8 @@ class BleInput extends ChangeNotifier {
 
   Input get value => __value;
 
-  final Map<void Function(Input), void Function()> _listeners = {};
+  final Map<void Function(Input), void Function()> _touchListeners = {};
+  final Map<void Function(Input), void Function()> _pressListeners = {};
 
   set _value(Input value) {
     if (value == __value) {
@@ -258,18 +259,33 @@ class BleInput extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTouchListener(void Function(Input) callback) {
+  void addPressListener(void Function(Input input) callback) {
+    listener() {
+      callback(value);
+    }
+
+    _pressListeners[callback] = listener;
+    super.addListener(listener);
+  }
+
+  void removePressListener(void Function(Input) callback) {
+    final listener = _pressListeners.remove(callback);
+    if (listener == null) return;
+    removeListener(listener);
+  }
+
+  void addTouchListener(void Function(Input input) callback) {
     listener() {
       if (value == Input.none) return;
       callback(value);
     }
 
-    _listeners[callback] = listener;
-    addListener(listener);
+    _touchListeners[callback] = listener;
+    super.addListener(listener);
   }
 
   void removeTouchListener(void Function(Input) callback) {
-    final listener = _listeners.remove(callback);
+    final listener = _touchListeners.remove(callback);
     if (listener == null) return;
     removeListener(listener);
   }
