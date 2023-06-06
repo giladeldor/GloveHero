@@ -65,11 +65,9 @@ flutter:
   assets:
     - assets/audio/
     - assets/song-art/
+    - assets/backgrounds/
     - assets/hand-selector.png
-    - assets/recording-page-background.jpeg
-    - assets/menu-background.jpeg
-    - assets/leaderboard-menu-background.jpg
-
+    
   fonts:
     - family: Karmatic
       fonts:
