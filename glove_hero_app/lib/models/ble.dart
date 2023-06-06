@@ -126,8 +126,8 @@ class BleModel {
     final bluetoothConnectPermission =
         await Permission.bluetoothConnect.request();
 
-    return bluetoothScanPermission.isDenied ||
-        bluetoothConnectPermission.isDenied;
+    return bluetoothScanPermission.isGranted &&
+        bluetoothConnectPermission.isGranted;
   }
 
   final BleConnection connection = BleConnection();
@@ -137,7 +137,10 @@ class BleModel {
       return BleState.bluetoothPermissionDenied;
     }
 
-    if (_ble.status != BleStatus.ready) {
+    final status = await _ble.statusStream
+        .where((status) => status != BleStatus.unknown)
+        .first;
+    if (status != BleStatus.ready) {
       return BleState.bluetoothDisabled;
     }
 
