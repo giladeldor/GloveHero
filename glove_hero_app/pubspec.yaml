@@ -69,6 +69,7 @@ flutter:
     - assets/recording-page-background.jpeg
     - assets/menu-background.jpeg
     - assets/leaderboard-menu-background.jpg
+    - assets/recording-mode-background.jpg
 
   fonts:
     - family: Karmatic
