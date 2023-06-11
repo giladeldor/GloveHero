@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../styles.dart';
+
 class ControlsPage extends StatelessWidget {
   const ControlsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return Stack(children: [
+      Container(
         decoration: const BoxDecoration(
           color: Colors.black,
           image: DecorationImage(
@@ -15,6 +17,16 @@ class ControlsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 50, horizontal: 8),
+        child: FittedBox(
+          child: Text(
+            "Controls",
+            style: titleTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      )
+    ]);
   }
 }
