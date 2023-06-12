@@ -36,13 +36,13 @@ class _RecordingModePageState extends State<RecordingModePage>
       _input.addPressListener(_handleInput);
     });
 
-    Future.delayed(const Duration(seconds: 2)).then((_) {
+    Future.delayed(const Duration(seconds: 2)).then((_) async {
       AudioManager.playSong(_song);
       _onSongEndSubscription = AudioManager.onSongEnd(() async {
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File("$directory/${_song.touchDir}");
+        final file = await _song.touchFile;
+        await file.writeAsString(jsonEncode(_songTouches), flush: true);
 
-        file.writeAsString(jsonEncode(_songTouches));
+        _onSongEndSubscription?.cancel();
       });
     });
   }
@@ -101,7 +101,7 @@ class _RecordingModePageState extends State<RecordingModePage>
                           songName: _song.title, songArtPath: _song.artAsset),
                     ),
                   ),
-                  Spacer(flex: 1)
+                  const Spacer(flex: 1)
                 ],
               ),
             ),

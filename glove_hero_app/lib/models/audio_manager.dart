@@ -7,7 +7,7 @@ class AudioManager {
   static Future _playOperation = Future.value(null);
 
   static int get position {
-    if (_player.playing) return -1;
+    if (!_player.playing) return -1;
 
     return _player.position.inMilliseconds;
   }
