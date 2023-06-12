@@ -30,6 +30,8 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
       _input = context.read<BleInput>();
       _input.addTouchListener(_handleInput);
     });
+
+    AudioManager.playClip(0);
   }
 
   void _handleInput(Input input) {
@@ -57,37 +59,44 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/recording-page-background.jpeg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Align(
-          alignment: Alignment.center,
-          child: CarouselSlider(
-            items: SongCard.songs(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RecordingModePage(
-                            song: SongManager.songs[songIndex])));
-              },
+    return WillPopScope(
+      onWillPop: () {
+        AudioManager.stopSong();
+        return Future.value(true);
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/recording-page-background.jpeg"),
+              fit: BoxFit.cover,
             ),
-            carouselController: _carouselController,
-            options: CarouselOptions(
-              height: 400,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.8,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              enlargeCenterPage: true,
-              scrollDirection: Axis.horizontal,
-              onPageChanged: onPageChange,
+          ),
+          child: Align(
+            alignment: Alignment.center,
+            child: CarouselSlider(
+              items: SongCard.songs(
+                onPressed: () {
+                  AudioManager.stopSong();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecordingModePage(
+                              song: SongManager.songs[songIndex])));
+                },
+              ),
+              carouselController: _carouselController,
+              options: CarouselOptions(
+                height: 400,
+                aspectRatio: 16 / 9,
+                viewportFraction: 0.8,
+                initialPage: 0,
+                enableInfiniteScroll: true,
+                reverse: false,
+                enlargeCenterPage: true,
+                scrollDirection: Axis.horizontal,
+                onPageChanged: onPageChange,
+              ),
             ),
           ),
         ),
@@ -117,7 +126,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
   }
 
   onPageChange(int index, CarouselPageChangedReason reason) {
-    index = songIndex;
-    AudioManager.playClip(index);
+    songIndex = index;
+    AudioManager.playClip(songIndex);
   }
 }

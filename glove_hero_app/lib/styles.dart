@@ -17,3 +17,9 @@ const menuButtonDisabledTextStyle = TextStyle(
   fontSize: 30,
   color: Colors.grey,
 );
+
+const dialogTextStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 75,
+  color: Colors.black,
+);

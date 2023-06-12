@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
+import 'package:glove_hero_app/styles.dart';
 import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/song.dart';
 
@@ -24,6 +24,7 @@ class _RecordingModePageState extends State<RecordingModePage>
   late BleInput _input;
   final SongTouches _songTouches = SongTouches();
   StreamSubscription<PlayerState>? _onSongEndSubscription;
+  var _isVisible = true;
 
   @override
   void initState() {
@@ -35,16 +36,44 @@ class _RecordingModePageState extends State<RecordingModePage>
       _input = context.read<BleInput>();
       _input.addPressListener(_handleInput);
     });
+  }
 
-    Future.delayed(const Duration(seconds: 2)).then((_) async {
-      AudioManager.playSong(_song);
-      _onSongEndSubscription = AudioManager.onSongEnd(() async {
-        final file = await _song.touchFile;
-        await file.writeAsString(jsonEncode(_songTouches), flush: true);
+  void endSong() async {
+    final file = await _song.touchFile;
+    await file.writeAsString(jsonEncode(_songTouches), flush: true);
 
-        _onSongEndSubscription?.cancel();
-      });
-    });
+    _onSongEndSubscription?.cancel();
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 2))
+              .then((value) => Navigator.pop(context));
+          return const AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            title: Text(
+              "Saved Song Recording!",
+              textAlign: TextAlign.center,
+            ),
+            titleTextStyle: dialogTextStyle,
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 50,
+              child: Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 50,
+              ),
+            ),
+            backgroundColor: Color.fromARGB(200, 255, 255, 255),
+          );
+        },
+      ).then((value) => Navigator.of(context)
+        ..maybePop()
+        ..maybePop());
+    }
   }
 
   void _handleInput(Input input) {
@@ -94,13 +123,37 @@ class _RecordingModePageState extends State<RecordingModePage>
               child: Column(
                 children: [
                   Flexible(
-                    flex: 1,
+                    flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SongCard(
                           songName: _song.title, songArtPath: _song.artAsset),
                     ),
                   ),
+                  _isVisible
+                      ? Flexible(
+                          flex: 1,
+                          child: CircularCountDownTimer(
+                            width: MediaQuery.of(context).size.width / 2,
+                            height: MediaQuery.of(context).size.height / 4,
+                            duration: 3,
+                            fillColor: const Color.fromARGB(255, 15, 231, 22),
+                            ringColor: Colors.grey[500]!,
+                            isReverse: true,
+                            textStyle: titleTextStyle,
+                            onComplete: () {
+                              setState(() {
+                                _isVisible = false;
+                              });
+                              AudioManager.playSong(_song);
+                              _onSongEndSubscription =
+                                  AudioManager.onSongEnd(endSong);
+                            },
+                          ),
+                        )
+                      : const Spacer(
+                          flex: 1,
+                        ),
                   const Spacer(flex: 1)
                 ],
               ),
