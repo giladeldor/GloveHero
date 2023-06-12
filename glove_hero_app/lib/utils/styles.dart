@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/ble.dart';
 
 const titleTextStyle = TextStyle(
   fontFamily: "Karmatic",
@@ -17,3 +18,10 @@ const menuButtonDisabledTextStyle = TextStyle(
   fontSize: 30,
   color: Colors.grey,
 );
+
+const Map<Input, Color> inputColors = {
+  Input.input1: Colors.green,
+  Input.input2: Colors.red,
+  Input.input3: Colors.yellow,
+  Input.input4: Colors.blue,
+};

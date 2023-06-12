@@ -3,7 +3,7 @@ import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/pages/recording_mode_menu_page.dart';
 import 'package:provider/provider.dart';
 import '../models/controller_action.dart';
-import '../styles.dart';
+import '../utils/styles.dart';
 import 'leaderboard_page.dart';
 
 class MenuPage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/song.dart';
-import '../styles.dart';
+import '../utils/styles.dart';
 
 class SongCard extends StatelessWidget {
   const SongCard({

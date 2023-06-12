@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/song.dart';
-import 'package:glove_hero_app/styles.dart';
+import 'package:glove_hero_app/utils/styles.dart';
 import '../widgets/song_card.dart';
 
 class LeaderboardPage extends StatefulWidget {
