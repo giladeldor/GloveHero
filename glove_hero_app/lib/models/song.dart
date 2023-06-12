@@ -15,6 +15,8 @@ class Song {
 
   String get audioAsset => "assets/audio/$_assetTitle.mp3";
   String get artAsset => "assets/song-art/$_assetTitle.jpg";
+  String get touchDir => "touches/$_assetTitle.json";
+  String get highScoreDir => "high-score/$_assetTitle.json";
 
   String get _assetTitle =>
       name.replaceAll(".", "").split(' ').join('-').toLowerCase();

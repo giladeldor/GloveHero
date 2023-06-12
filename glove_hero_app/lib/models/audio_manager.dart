@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import 'song.dart';
 
@@ -43,4 +44,9 @@ class AudioManager {
   static void dispose() {
     _player.dispose();
   }
+
+  static StreamSubscription<PlayerState> onSongEnd(void Function() callback) =>
+      _player.playerStateStream
+          .where((event) => event.processingState == ProcessingState.completed)
+          .listen((_) => callback());
 }

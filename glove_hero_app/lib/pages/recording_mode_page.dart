@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
 import 'package:glove_hero_app/widgets/song_card.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/song.dart';
 
@@ -17,7 +22,8 @@ class _RecordingModePageState extends State<RecordingModePage>
     with WidgetsBindingObserver {
   late Song _song;
   late BleInput _input;
-  List<Touch> touchList = [];
+  final SongTouches _songTouches = SongTouches();
+  StreamSubscription<PlayerState>? _onSongEndSubscription;
 
   @override
   void initState() {
@@ -29,8 +35,16 @@ class _RecordingModePageState extends State<RecordingModePage>
       _input = context.read<BleInput>();
       _input.addPressListener(_handleInput);
     });
-    Future.delayed(const Duration(seconds: 2))
-        .then((_) => AudioManager.playSong(_song));
+
+    Future.delayed(const Duration(seconds: 2)).then((_) {
+      AudioManager.playSong(_song);
+      _onSongEndSubscription = AudioManager.onSongEnd(() async {
+        final directory = await getApplicationDocumentsDirectory();
+        final file = File("$directory/${_song.touchDir}");
+
+        file.writeAsString(jsonEncode(_songTouches));
+      });
+    });
   }
 
   void _handleInput(Input input) {
@@ -43,7 +57,7 @@ class _RecordingModePageState extends State<RecordingModePage>
       final touch = TouchClassifier.release(AudioManager.position);
       if (touch == null) return;
 
-      touchList.add(touch);
+      _songTouches.addTouch(touch);
     } else {
       TouchClassifier.press(input, AudioManager.position);
     }
@@ -51,42 +65,48 @@ class _RecordingModePageState extends State<RecordingModePage>
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.height / 2;
+    return WillPopScope(
+      onWillPop: () {
+        _onSongEndSubscription?.cancel();
+        AudioManager.stopSong();
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.black,
-          image: DecorationImage(
-            image: AssetImage("assets/recording-mode-background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(children: [
-          Consumer<BleInput>(
-            builder: (context, input, child) {
-              return CustomPaint(
-                painter: Painter(input: input.value),
-                child: Container(),
-              );
-            },
-          ),
-          Center(
-            child: Column(
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SongCard(
-                        songName: _song.title, songArtPath: _song.artAsset),
-                  ),
-                ),
-                Spacer(flex: 1)
-              ],
+        return Future.value(true);
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            image: DecorationImage(
+              image: AssetImage("assets/recording-mode-background.jpg"),
+              fit: BoxFit.cover,
             ),
           ),
-        ]),
+          child: Stack(children: [
+            Consumer<BleInput>(
+              builder: (context, input, child) {
+                return CustomPaint(
+                  painter: Painter(input: input.value),
+                  child: Container(),
+                );
+              },
+            ),
+            Center(
+              child: Column(
+                children: [
+                  Flexible(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SongCard(
+                          songName: _song.title, songArtPath: _song.artAsset),
+                    ),
+                  ),
+                  Spacer(flex: 1)
+                ],
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }
