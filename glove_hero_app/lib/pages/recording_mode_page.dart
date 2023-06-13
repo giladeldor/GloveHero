@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
+import 'package:glove_hero_app/styles.dart';
 import 'package:glove_hero_app/utils/painter.dart';
 import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
@@ -23,6 +26,9 @@ class _RecordingModePageState extends State<RecordingModePage>
   late BleInput _input;
   final SongTouches _songTouches = SongTouches();
   StreamSubscription<PlayerState>? _onSongEndSubscription;
+  var _isVisible = true;
+
+  double _rating = 0.0;
 
   @override
   void initState() {
@@ -34,16 +40,67 @@ class _RecordingModePageState extends State<RecordingModePage>
       _input = context.read<BleInput>();
       _input.addPressListener(_handleInput);
     });
+  }
 
-    Future.delayed(const Duration(seconds: 2)).then((_) async {
-      AudioManager.playSong(_song);
-      _onSongEndSubscription = AudioManager.onSongEnd(() async {
-        final file = await _song.touchFile;
-        await file.writeAsString(jsonEncode(_songTouches), flush: true);
-
-        _onSongEndSubscription?.cancel();
-      });
-    });
+  void endSong() {
+    _onSongEndSubscription?.cancel();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          icon: const Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: 40,
+          ),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          title: const Text(
+            "Saved Song Recording!",
+            textAlign: TextAlign.center,
+          ),
+          titleTextStyle: dialogTitleStyle,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Please Rate The Difficulty Of The Song:",
+                textAlign: TextAlign.center,
+                style: dialogTextStyle,
+              ),
+              RatingBar.builder(
+                itemCount: 3,
+                itemSize: 50,
+                itemBuilder: (context, _) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    _rating = rating;
+                  });
+                },
+              ),
+              TextButton(
+                onPressed: () async {
+                  _songTouches.setDifficulty(_rating.toInt());
+                  final file = await _song.touchFile;
+                  await file.writeAsString(jsonEncode(_songTouches),
+                      flush: true);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+          backgroundColor: const Color.fromARGB(200, 255, 255, 255),
+        );
+      },
+    ).then((value) => Navigator.of(context)
+      ..maybePop()
+      ..maybePop());
   }
 
   void _handleInput(Input input) {
@@ -93,13 +150,38 @@ class _RecordingModePageState extends State<RecordingModePage>
               child: Column(
                 children: [
                   Flexible(
-                    flex: 1,
+                    flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SongCard(
                           songName: _song.title, songArtPath: _song.artAsset),
                     ),
                   ),
+                  _isVisible
+                      ? Flexible(
+                          flex: 1,
+                          child: CircularCountDownTimer(
+                            width: MediaQuery.of(context).size.width / 2,
+                            height: MediaQuery.of(context).size.height / 4,
+                            duration: 3,
+                            fillColor: const Color.fromARGB(255, 15, 231, 22),
+                            ringColor: Colors.grey[500]!,
+                            isReverse: true,
+                            textStyle: titleTextStyle,
+                            onComplete: () {
+                              setState(() {
+                                _isVisible = false;
+                              });
+                              endSong();
+                              //AudioManager.playSong(_song);
+                              //_onSongEndSubscription =
+                              //    AudioManager.onSongEnd(endSong);
+                            },
+                          ),
+                        )
+                      : const Spacer(
+                          flex: 1,
+                        ),
                   const Spacer(flex: 1)
                 ],
               ),

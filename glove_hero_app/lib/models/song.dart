@@ -187,7 +187,7 @@ class SongManager {
     Song(
       name: "You Give Love A Bad Name",
       title: "YGLABN",
-      previewSpan: PreviewSpan(start: 14, end: 60),
+      previewSpan: PreviewSpan(start: 14, end: 30),
       volume: 0.7,
     ),
   ];

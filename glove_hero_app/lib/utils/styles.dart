@@ -19,6 +19,18 @@ const menuButtonDisabledTextStyle = TextStyle(
   color: Colors.grey,
 );
 
+const dialogTitleStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 75,
+  color: Colors.black,
+);
+
+const dialogTextStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 35,
+  color: Colors.black,
+);
+
 const Map<Input, Color> inputColors = {
   Input.input1: Colors.green,
   Input.input2: Colors.red,

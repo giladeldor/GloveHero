@@ -33,21 +33,30 @@ class Touch {
 
 class SongTouches {
   final List<Touch> _touches;
+  late int difficulty;
   UnmodifiableListView<Touch> get touches => UnmodifiableListView(_touches);
 
-  SongTouches() : _touches = [];
+  SongTouches()
+      : _touches = [],
+        difficulty = 0;
 
   SongTouches.fromJson(Map<String, dynamic> json)
       : _touches = (json['touches'] as List<dynamic>)
             .map((e) => Touch.fromJson(e))
-            .toList();
+            .toList(),
+        difficulty = json['difficulty'];
 
   Map<String, dynamic> toJson() => {
         'touches': _touches,
+        'difficulty': difficulty,
       };
 
   void addTouch(Touch touch) {
     _touches.add(touch);
+  }
+
+  void setDifficulty(int rating) {
+    difficulty = rating;
   }
 }
 
