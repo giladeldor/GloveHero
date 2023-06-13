@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
+
+import 'package:glove_hero_app/pages/controls_page.dart';
+import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:glove_hero_app/pages/recording_mode_menu_page.dart';
 import 'package:provider/provider.dart';
 import '../models/controller_action.dart';
@@ -71,7 +74,9 @@ class _MenuPageState extends State<MenuPage> {
         // Navigator.pushNamed(context, "/statistics");
         break;
       case _MenuButtonID.controls:
-        // Navigator.pushNamed(context, "/controls");
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const ControlsPage(),
+        ));
         break;
       default:
     }
@@ -95,7 +100,7 @@ class _MenuPageState extends State<MenuPage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/menu-background.jpeg"),
+            image: AssetImage("assets/backgrounds/menu-background.jpeg"),
             fit: BoxFit.cover,
           ),
         ),
