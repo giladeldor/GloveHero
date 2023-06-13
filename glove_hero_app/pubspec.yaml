@@ -42,6 +42,7 @@ dependencies:
   just_audio: ^0.9.33
   path_provider: ^2.0.15
   circular_countdown_timer: ^0.2.3
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

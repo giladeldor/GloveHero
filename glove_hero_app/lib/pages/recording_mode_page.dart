@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
@@ -26,6 +27,8 @@ class _RecordingModePageState extends State<RecordingModePage>
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   var _isVisible = true;
 
+  double _rating = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -38,42 +41,65 @@ class _RecordingModePageState extends State<RecordingModePage>
     });
   }
 
-  void endSong() async {
-    final file = await _song.touchFile;
-    await file.writeAsString(jsonEncode(_songTouches), flush: true);
-
+  void endSong() {
     _onSongEndSubscription?.cancel();
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          Future.delayed(const Duration(seconds: 2))
-              .then((value) => Navigator.pop(context));
-          return const AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            title: Text(
-              "Saved Song Recording!",
-              textAlign: TextAlign.center,
-            ),
-            titleTextStyle: dialogTextStyle,
-            content: SizedBox(
-              width: double.maxFinite,
-              height: 50,
-              child: Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 50,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          icon: const Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: 40,
+          ),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          title: const Text(
+            "Saved Song Recording!",
+            textAlign: TextAlign.center,
+          ),
+          titleTextStyle: dialogTitleStyle,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Please Rate The Difficulty Of The Song:",
+                textAlign: TextAlign.center,
+                style: dialogTextStyle,
               ),
-            ),
-            backgroundColor: Color.fromARGB(200, 255, 255, 255),
-          );
-        },
-      ).then((value) => Navigator.of(context)
-        ..maybePop()
-        ..maybePop());
-    }
+              RatingBar.builder(
+                itemCount: 3,
+                itemSize: 50,
+                itemBuilder: (context, _) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    _rating = rating;
+                  });
+                },
+              ),
+              TextButton(
+                onPressed: () async {
+                  _songTouches.setDifficulty(_rating.toInt());
+                  final file = await _song.touchFile;
+                  await file.writeAsString(jsonEncode(_songTouches),
+                      flush: true);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+          backgroundColor: const Color.fromARGB(200, 255, 255, 255),
+        );
+      },
+    ).then((value) => Navigator.of(context)
+      ..maybePop()
+      ..maybePop());
   }
 
   void _handleInput(Input input) {
@@ -145,9 +171,10 @@ class _RecordingModePageState extends State<RecordingModePage>
                               setState(() {
                                 _isVisible = false;
                               });
-                              AudioManager.playSong(_song);
-                              _onSongEndSubscription =
-                                  AudioManager.onSongEnd(endSong);
+                              endSong();
+                              //AudioManager.playSong(_song);
+                              //_onSongEndSubscription =
+                              //    AudioManager.onSongEnd(endSong);
                             },
                           ),
                         )
