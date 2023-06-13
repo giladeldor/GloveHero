@@ -41,7 +41,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             child: Align(
               alignment: Alignment.center,
               child: CarouselSlider(
-                items: SongCard.songs(onPressed: () {
+                items: SongCard.songs(() {
                   _carouselController.nextPage();
                 }),
                 carouselController: _carouselController,
