@@ -68,15 +68,8 @@ flutter:
   assets:
     - assets/audio/
     - assets/song-art/
+    - assets/
     - assets/backgrounds/
-    - assets/hand-selector.png
-
-    
-    - assets/recording-page-background.jpeg
-    - assets/menu-background.jpeg
-    - assets/leaderboard-menu-background.jpg
-    - assets/recording-mode-background.jpg
-
   fonts:
     - family: Karmatic
       fonts:
@@ -85,3 +78,7 @@ flutter:
     - family: Dialog
       fonts:
         - asset: fonts/game_over.ttf
+
+    - family: HighScore
+      fonts:
+        - asset: fonts/PressStart2P-Regular.ttf
