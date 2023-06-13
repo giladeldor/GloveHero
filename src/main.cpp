@@ -22,7 +22,6 @@
 
 static Adafruit_NeoPixel pixels(NUM_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 static int idx = 0;
-static unsigned long lastUpdate = 0;
 static BLECharacteristic* touchCharacteristic;
 static BLECharacteristic* ledCharacteristics[NUM_INPUTS];
 static const char* ledUuids[NUM_INPUTS] = {
@@ -30,12 +29,11 @@ static const char* ledUuids[NUM_INPUTS] = {
     MIDDLE_LED_CHARACTERISTIC_UUID, INDEX_LED_CHARACTERISTIC_UUID};
 // static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
 static KeyboardInput glove;
+static Input lastInput;
 
 class Callbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* server, esp_ble_gatts_cb_param_t* param) {
-        Serial.println("Connected, Peer MTU size: " +
-                       String(server->getPeerMTU(param->connect.conn_id)) +
-                       " Server MTU size: " + BLEDevice::getMTU());
+        Serial.println("Connected");
         server->updateConnParams(param->connect.remote_bda, 8, 8, 1, 400);
         delay(500);
     }
@@ -85,14 +83,17 @@ void setup() {
     advertising->setMinPreferred(0x06);
     advertising->setMinPreferred(0x12);
     BLEDevice::startAdvertising();
-
-    lastUpdate = millis();
 }
 
 void loop() {
     Input input = glove.update();
-    int touchValue = static_cast<int>(input);
-    touchCharacteristic->setValue(touchValue);
+    if (input != lastInput) {
+        lastInput = input;
+
+        int touchValue = static_cast<int>(input);
+        touchCharacteristic->setValue(touchValue);
+        touchCharacteristic->notify();
+    }
 
     pixels.clear();
     if (input == Input::Input1) {
@@ -104,6 +105,7 @@ void loop() {
     } else if (input == Input::Input4) {
         pixels.fill(pixels.Color(150, 150, 0));
     }
+
     // for (int i = 0; i < NUM_INPUTS; i++) {
     //     auto data = ledCharacteristics[i]->getValue();
 
@@ -117,10 +119,4 @@ void loop() {
     // }
 
     pixels.show();
-
-    auto current = millis();
-    if (current - lastUpdate >= 5) {
-        lastUpdate = current;
-        touchCharacteristic->notify();
-    }
 }
