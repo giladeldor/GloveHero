@@ -24,5 +24,30 @@ const dialogTitleStyle = TextStyle(
   color: Colors.black,
 );
 
-const dialogTextStyle =
-    TextStyle(fontFamily: "Dialog", fontSize: 35, color: Colors.black);
+const dialogTextStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 35,
+  color: Colors.black,
+);
+
+const highScoreTextStyle = TextStyle(
+  fontFamily: "HighScore",
+  fontSize: 15,
+  color: Colors.white,
+);
+
+const highScoreTitle = TextStyle(
+  fontFamily: "HighScore",
+  fontSize: 17,
+  color: Colors.white,
+  fontWeight: FontWeight.w600,
+  decoration: TextDecoration.underline,
+  decorationThickness: 2.5,
+);
+
+const leaderBoardTitle = TextStyle(
+  fontFamily: "Karmatic",
+  fontSize: 45,
+  fontWeight: FontWeight.bold,
+  color: Color.fromARGB(255, 0, 0, 0), // eran is not satisfied
+);

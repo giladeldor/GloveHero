@@ -26,7 +26,7 @@ class _RecordingModePageState extends State<RecordingModePage>
   final SongTouches _songTouches = SongTouches();
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   var _isVisible = true;
-
+  int countdown = 2;
   double _rating = 0.0;
 
   @override
@@ -175,6 +175,14 @@ class _RecordingModePageState extends State<RecordingModePage>
                               //AudioManager.playSong(_song);
                               //_onSongEndSubscription =
                               //    AudioManager.onSongEnd(endSong);
+                            },
+                            onChange: (value) {
+                              if (value != countdown.toString()) {
+                                switch (value) {
+                                  case '2':
+                                    setState(() {});
+                                }
+                              }
                             },
                           ),
                         )
