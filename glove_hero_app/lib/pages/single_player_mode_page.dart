@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/touch.dart';
 import 'package:glove_hero_app/utils/painter.dart';
@@ -43,26 +44,31 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Flexible(
+                          child: AutoSizeText(
                             _song.title,
                             textAlign: TextAlign.center,
-                            style: titleTextStyle,
+                            style: titleTextStyle.copyWith(fontSize: 30),
+                            maxLines: 2,
+                            wrapWords: false,
                           ),
                         ),
-                      ),
-                      const Flexible(
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: _Score(score: 0),
-                        ),
-                      )
-                    ],
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: _Score(score: _score),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   const Spacer(flex: 1)
                 ],
@@ -82,20 +88,13 @@ class _Score extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FittedBox(
-        child: Text(
-          "Score:\n$score",
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 50,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+    return Text(
+      "Score\n$score",
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontFamily: "Karmatic",
+        color: Color.fromARGB(255, 250, 244, 193),
+        fontSize: 30,
       ),
     );
   }

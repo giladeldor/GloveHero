@@ -6,12 +6,12 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
-import 'package:glove_hero_app/styles.dart';
 import 'package:glove_hero_app/utils/painter.dart';
 import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../models/song.dart';
+import '../utils/styles.dart';
 
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
