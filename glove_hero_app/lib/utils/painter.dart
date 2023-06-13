@@ -14,8 +14,6 @@ abstract class PainterBase extends CustomPainter {
     ..strokeWidth = 5
     ..style = PaintingStyle.fill;
 
-  static const double _millisecondsPerDrop = 3000;
-
   double _radius(Size size) => size.width / 10;
 
   double _circleCenterWidth(Size size, {required int index}) {
@@ -28,14 +26,19 @@ abstract class PainterBase extends CustomPainter {
     Size size, {
     required Touch touch,
     required int timeStamp,
+    required int window,
   }) {
     final radius = _radius(size);
-    final ratio = _inputLineHeight(size) / _millisecondsPerDrop;
+    final ratio = _inputLineHeight(size) / window;
 
     final xPos = _circleCenterWidth(size, index: touch.input.idx);
-    var bottom = ratio * (timeStamp - touch.timeStamp + _millisecondsPerDrop);
+    var bottom = ratio * (timeStamp - touch.timeStamp + window);
     final top = bottom - ratio * (touch.duration ?? 0);
     bottom = min(bottom, _inputLineHeight(size));
+
+    if (bottom < top) {
+      return Path();
+    }
 
     return Path()
       ..addArc(
@@ -82,10 +85,16 @@ abstract class PainterBase extends CustomPainter {
     }
   }
 
-  void paintTouch(Canvas canvas, Size size,
-      {required Touch touch, required int timeStamp}) {
+  void paintTouch(
+    Canvas canvas,
+    Size size, {
+    required Touch touch,
+    required int timeStamp,
+    required int window,
+  }) {
     final paint = _paintFill..color = inputColors[touch.input]!.withAlpha(150);
-    final path = _touchPath(size, touch: touch, timeStamp: timeStamp);
+    final path =
+        _touchPath(size, touch: touch, timeStamp: timeStamp, window: window);
     canvas.drawPath(path, paint);
   }
 

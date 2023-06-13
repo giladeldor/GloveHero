@@ -58,6 +58,14 @@ class SongTouches {
   void setDifficulty(int rating) {
     difficulty = rating;
   }
+
+  List<Touch> getTouchesInWindow(int timestamp, int windowSize) {
+    return _touches
+        .where((touch) =>
+            touch.timeStamp + (touch.duration ?? 0) >= timestamp ||
+            touch.timeStamp <= timestamp + windowSize)
+        .toList();
+  }
 }
 
 enum TouchType {

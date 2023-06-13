@@ -5,6 +5,7 @@ import 'package:glove_hero_app/utils/painter.dart';
 import 'package:glove_hero_app/utils/styles.dart';
 import 'package:provider/provider.dart';
 
+import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/song.dart';
 
@@ -35,7 +36,11 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage> {
             Consumer<BleInput>(
               builder: (context, input, child) {
                 return CustomPaint(
-                  painter: _Painter(input: input.value),
+                  painter: _Painter(
+                    input: input.value,
+                    timestamp: AudioManager.position,
+                    touches: SongTouches(),
+                  ),
                   child: Container(),
                 );
               },
@@ -101,22 +106,29 @@ class _Score extends StatelessWidget {
 }
 
 class _Painter extends PainterBase {
-  final Input input;
+  static const windowSize = 3000;
 
-  _Painter({required this.input});
+  final Input input;
+  final int timestamp;
+  final SongTouches touches;
+
+  _Painter({
+    required this.input,
+    required this.timestamp,
+    required this.touches,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     paintInputCircles(canvas, size, activeInput: input);
-    paintTouch(
-      canvas,
-      size,
-      touch: Touch.long(
-        input: Input.input1,
-        timeStamp: 3000,
-        duration: 1000,
-      ),
-      timeStamp: 500,
-    );
+    for (var touch in touches.getTouchesInWindow(timestamp, windowSize)) {
+      paintTouch(
+        canvas,
+        size,
+        touch: touch,
+        timeStamp: timestamp,
+        window: windowSize,
+      );
+    }
   }
 }
