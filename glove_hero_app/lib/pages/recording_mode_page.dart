@@ -9,7 +9,6 @@ import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../models/song.dart';
-import '../utils/styles.dart';
 
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
@@ -153,10 +152,14 @@ class _TouchClassifier {
 
     return switch (elapsed > minDuration) {
       true => Touch.long(
+          input: lastInput,
           timeStamp: _TouchClassifier.timeStamp,
           duration: elapsed,
         ),
-      false => Touch.regular(timeStamp: _TouchClassifier.timeStamp),
+      false => Touch.regular(
+          input: lastInput,
+          timeStamp: _TouchClassifier.timeStamp,
+        ),
     };
   }
 }

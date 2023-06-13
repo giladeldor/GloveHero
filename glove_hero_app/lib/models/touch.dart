@@ -1,23 +1,30 @@
 import 'dart:collection';
+import 'ble.dart';
 
 class Touch {
+  final Input input;
   final TouchType type;
   final int timeStamp;
   final int? duration;
 
-  Touch.regular({required this.timeStamp})
+  Touch.regular({required this.input, required this.timeStamp})
       : type = TouchType.regular,
         duration = null;
 
-  Touch.long({required this.timeStamp, required this.duration})
-      : type = TouchType.long;
+  Touch.long({
+    required this.input,
+    required this.timeStamp,
+    required this.duration,
+  }) : type = TouchType.long;
 
   Touch.fromJson(Map<String, dynamic> json)
-      : type = TouchType.fromString(json["type"]),
+      : input = Input.fromIdx(json["input"]),
+        type = TouchType.fromString(json["type"]),
         timeStamp = json['timeStamp'],
         duration = json['duration'];
 
   Map<String, dynamic> toJson() => {
+        'input': input.index,
         'type': type.toString(),
         'timeStamp': timeStamp,
         'duration': duration,
