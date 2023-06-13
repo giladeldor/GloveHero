@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import 'song.dart';
 
-class AudioManager {
+abstract class AudioManager {
   static final _player = AudioPlayer();
   static Future _playOperation = Future.value(null);
 
@@ -17,20 +17,21 @@ class AudioManager {
     _player.play();
   }
 
-  static void stopSong() {
+  static void play() {
+    _player.play();
+  }
+
+  static void stop() {
     _player.stop();
   }
 
-  static void pauseSong() {
+  static void pause() {
     _player.pause();
   }
 
-  static void playClip(int index) async {
+  static void playClip(Song song) {
     _playOperation = _playOperation.then(
       (_) async {
-        await _player.stop();
-
-        Song song = SongManager.songs[index];
         await _player.setVolume(song.volume);
         await _player.setAsset(song.audioAsset);
         await _player.setClip(

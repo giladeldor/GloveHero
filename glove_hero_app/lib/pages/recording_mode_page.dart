@@ -57,7 +57,6 @@ class _RecordingModePageState extends State<RecordingModePage>
     if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
-
     // TODO: activate LEDs
     if (input == Input.none) {
       final touch = _TouchClassifier.release(AudioManager.position);
@@ -74,7 +73,7 @@ class _RecordingModePageState extends State<RecordingModePage>
     return WillPopScope(
       onWillPop: () {
         _onSongEndSubscription?.cancel();
-        AudioManager.stopSong();
+        AudioManager.stop();
 
         return Future.value(true);
       },
@@ -140,16 +139,17 @@ class _RecordingModePageState extends State<RecordingModePage>
     super.dispose();
 
     _input.removeTouchListener(_handleInput);
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        AudioManager.pauseSong();
+        AudioManager.pause();
         break;
       case AppLifecycleState.resumed:
-        // audioManager.player.play();
+        AudioManager.play();
         break;
       default:
         break;

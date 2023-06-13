@@ -24,7 +24,7 @@ class Touch {
         duration = json['duration'];
 
   Map<String, dynamic> toJson() => {
-        'input': input.index,
+        'input': input.idx,
         'type': type.toString(),
         'timeStamp': timeStamp,
         'duration': duration,
@@ -59,10 +59,10 @@ class SongTouches {
     difficulty = rating;
   }
 
-  List<Touch> getTouchesInWindow(int timestamp, int windowSize) {
+  List<Touch> getTouchesInWindow(int timestamp, int windowSize, int offset) {
     return _touches
         .where((touch) =>
-            touch.timeStamp + (touch.duration ?? 0) >= timestamp ||
+            touch.timeStamp + (touch.duration ?? 0) >= timestamp - offset &&
             touch.timeStamp <= timestamp + windowSize)
         .toList();
   }

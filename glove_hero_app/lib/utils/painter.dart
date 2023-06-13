@@ -33,12 +33,11 @@ abstract class PainterBase extends CustomPainter {
 
     final xPos = _circleCenterWidth(size, index: touch.input.idx);
     var bottom = ratio * (timeStamp - touch.timeStamp + window);
-    final top = bottom - ratio * (touch.duration ?? 0);
+    final top = min(
+      bottom - ratio * (touch.duration ?? 0),
+      _inputLineHeight(size),
+    );
     bottom = min(bottom, _inputLineHeight(size));
-
-    if (bottom < top) {
-      return Path();
-    }
 
     return Path()
       ..addArc(

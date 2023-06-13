@@ -31,7 +31,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
       _input.addTouchListener(_handleInput);
     });
 
-    AudioManager.playClip(0);
+    AudioManager.playClip(SongManager.songs[songIndex]);
   }
 
   void _handleInput(Input input) {
@@ -61,7 +61,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        AudioManager.stopSong();
+        AudioManager.stop();
         return Future.value(true);
       },
       child: Scaffold(
@@ -77,7 +77,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
             child: CarouselSlider(
               items: SongCard.songs(
                 onPressed: () {
-                  AudioManager.stopSong();
+                  AudioManager.stop();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -108,6 +108,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
   void dispose() {
     super.dispose();
 
+    WidgetsBinding.instance.removeObserver(this);
     _input.removeTouchListener(_handleInput);
   }
 
@@ -115,10 +116,10 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        AudioManager.pauseSong();
+        AudioManager.pause();
         break;
       case AppLifecycleState.resumed:
-        // audioManager.player.play();
+        AudioManager.play();
         break;
       default:
         break;
@@ -127,6 +128,6 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
 
   onPageChange(int index, CarouselPageChangedReason reason) {
     songIndex = index;
-    AudioManager.playClip(songIndex);
+    AudioManager.playClip(SongManager.songs[songIndex]);
   }
 }
