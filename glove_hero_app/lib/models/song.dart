@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+
 import 'high_score.dart';
 
 class Song {
@@ -15,6 +19,20 @@ class Song {
 
   String get audioAsset => "assets/audio/$_assetTitle.mp3";
   String get artAsset => "assets/song-art/$_assetTitle.jpg";
+  Future<File> get touchFile async {
+    return File("${await _localDir}/touches/$_assetTitle.json")
+        .create(recursive: true);
+  }
+
+  Future<File> get highScoreFile async {
+    return File("${await _localDir}/high-scores/$_assetTitle.json")
+        .create(recursive: true);
+  }
+
+  Future<String> get _localDir async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
 
   String get _assetTitle =>
       name.replaceAll(".", "").split(' ').join('-').toLowerCase();
@@ -169,7 +187,7 @@ class SongManager {
     Song(
       name: "You Give Love A Bad Name",
       title: "YGLABN",
-      previewSpan: PreviewSpan(start: 14, end: 60),
+      previewSpan: PreviewSpan(start: 14, end: 30),
       volume: 0.7,
     ),
   ];
