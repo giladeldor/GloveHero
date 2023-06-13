@@ -160,22 +160,15 @@ class _RecordingModePageState extends State<RecordingModePage>
                   _isVisible
                       ? Flexible(
                           flex: 1,
-                          child: CircularCountDownTimer(
-                            width: MediaQuery.of(context).size.width / 2,
-                            height: MediaQuery.of(context).size.height / 4,
-                            duration: 3,
-                            fillColor: const Color.fromARGB(255, 15, 231, 22),
-                            ringColor: Colors.grey[500]!,
-                            isReverse: true,
-                            textStyle: titleTextStyle,
+                          child: _CountDown(
                             onComplete: () {
                               setState(() {
                                 _isVisible = false;
                               });
-                              endSong();
-                              //AudioManager.playSong(_song);
-                              //_onSongEndSubscription =
-                              //    AudioManager.onSongEnd(endSong);
+                              AudioManager.playSong(_song);
+                              _onSongEndSubscription = AudioManager.onSongEnd(
+                                endSong,
+                              );
                             },
                           ),
                         )
@@ -211,6 +204,27 @@ class _RecordingModePageState extends State<RecordingModePage>
       default:
         break;
     }
+  }
+}
+
+class _CountDown extends StatelessWidget {
+  const _CountDown({
+    this.onComplete,
+  });
+  final Function()? onComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircularCountDownTimer(
+      width: MediaQuery.of(context).size.width / 2,
+      height: MediaQuery.of(context).size.height / 4,
+      duration: 3,
+      fillColor: const Color.fromARGB(255, 15, 231, 22),
+      ringColor: Colors.grey[500]!,
+      isReverse: true,
+      textStyle: titleTextStyle,
+      onComplete: onComplete,
+    );
   }
 }
 
