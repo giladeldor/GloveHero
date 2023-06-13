@@ -14,7 +14,7 @@ class SongCard extends StatelessWidget {
   final String songArtPath;
   final void Function()? onPressed;
 
-  static List<SongCard> songs({void Function()? onPressed}) => SongManager.songs
+  static List<SongCard> songs(void Function()? onPressed) => SongManager.songs
       .map(
         (song) => SongCard(
           songName: song.title,

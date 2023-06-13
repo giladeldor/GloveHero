@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:glove_hero_app/models/song.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
 import 'models/ble.dart';
 import 'pages/menu_page.dart';
@@ -13,7 +11,7 @@ void main() async {
 
   final bleModel = BleModel();
   // TODO: Create a system for connecting / disconnecting and handling failures.
-  bleModel.connect();
+  await bleModel.connect();
 
   runApp(
     MultiProvider(

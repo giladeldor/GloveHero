@@ -28,8 +28,7 @@ static BLECharacteristic* ledCharacteristics[NUM_INPUTS];
 static const char* ledUuids[NUM_INPUTS] = {
     PINKY_LED_CHARACTERISTIC_UUID, RING_LED_CHARACTERISTIC_UUID,
     MIDDLE_LED_CHARACTERISTIC_UUID, INDEX_LED_CHARACTERISTIC_UUID};
-// static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
-static KeyboardInput glove;
+static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
 
 class Callbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* server, esp_ble_gatts_cb_param_t* param) {
@@ -94,27 +93,16 @@ void loop() {
     int touchValue = static_cast<int>(input);
     touchCharacteristic->setValue(touchValue);
 
-    pixels.clear();
-    if (input == Input::Input1) {
-        pixels.fill(pixels.Color(150, 0, 0));
-    } else if (input == Input::Input2) {
-        pixels.fill(pixels.Color(0, 150, 0));
-    } else if (input == Input::Input3) {
-        pixels.fill(pixels.Color(0, 0, 150));
-    } else if (input == Input::Input4) {
-        pixels.fill(pixels.Color(150, 150, 0));
-    }
-    // for (int i = 0; i < NUM_INPUTS; i++) {
-    //     auto data = ledCharacteristics[i]->getValue();
+    for (int i = 0; i < NUM_INPUTS; i++) {
+        auto data = ledCharacteristics[i]->getValue();
 
-    //     for (int j = 0; j < NUM_PIXELS_PER_INPUT; j++) {
-    //         uint8_t red = data.c_str()[j * 3];
-    //         uint8_t green = data.c_str()[j * 3 + 1];
-    //         uint8_t blue = data.c_str()[j * 3 + 2];
-    //         pixels.setPixelColor(i < 3 ? i : 2, pixels.Color(red, green,
-    //         blue));
-    //     }
-    // }
+        for (int j = 0; j < NUM_PIXELS_PER_INPUT; j++) {
+            uint8_t red = data.c_str()[j * 3];
+            uint8_t green = data.c_str()[j * 3 + 1];
+            uint8_t blue = data.c_str()[j * 3 + 2];
+            pixels.setPixelColor(i < 3 ? i : 2, pixels.Color(red, green, blue));
+        }
+    }
 
     pixels.show();
 

@@ -126,8 +126,8 @@ class BleModel {
     final bluetoothConnectPermission =
         await Permission.bluetoothConnect.request();
 
-    return bluetoothScanPermission.isGranted &&
-        bluetoothConnectPermission.isGranted;
+    return bluetoothScanPermission.isDenied ||
+        bluetoothConnectPermission.isDenied;
   }
 
   final BleConnection connection = BleConnection();
@@ -137,10 +137,7 @@ class BleModel {
       return BleState.bluetoothPermissionDenied;
     }
 
-    final status = await _ble.statusStream
-        .where((status) => status != BleStatus.unknown)
-        .first;
-    if (status != BleStatus.ready) {
+    if (_ble.status != BleStatus.ready) {
       return BleState.bluetoothDisabled;
     }
 
@@ -247,8 +244,7 @@ class BleInput extends ChangeNotifier {
 
   Input get value => __value;
 
-  final Map<void Function(Input), void Function()> _touchListeners = {};
-  final Map<void Function(Input), void Function()> _pressListeners = {};
+  final Map<void Function(Input), void Function()> _listeners = {};
 
   set _value(Input value) {
     if (value == __value) {
@@ -259,33 +255,18 @@ class BleInput extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addPressListener(void Function(Input input) callback) {
-    listener() {
-      callback(value);
-    }
-
-    _pressListeners[callback] = listener;
-    super.addListener(listener);
-  }
-
-  void removePressListener(void Function(Input) callback) {
-    final listener = _pressListeners.remove(callback);
-    if (listener == null) return;
-    removeListener(listener);
-  }
-
-  void addTouchListener(void Function(Input input) callback) {
+  void addTouchListener(void Function(Input) callback) {
     listener() {
       if (value == Input.none) return;
       callback(value);
     }
 
-    _touchListeners[callback] = listener;
-    super.addListener(listener);
+    _listeners[callback] = listener;
+    addListener(listener);
   }
 
   void removeTouchListener(void Function(Input) callback) {
-    final listener = _touchListeners.remove(callback);
+    final listener = _listeners.remove(callback);
     if (listener == null) return;
     removeListener(listener);
   }
