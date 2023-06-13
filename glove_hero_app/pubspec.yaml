@@ -40,6 +40,9 @@ dependencies:
   flutter_spinkit: ^5.2.0
   carousel_slider: ^4.2.1
   just_audio: ^0.9.33
+  path_provider: ^2.0.15
+  circular_countdown_timer: ^0.2.3
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:
@@ -67,8 +70,18 @@ flutter:
     - assets/song-art/
     - assets/backgrounds/
     - assets/hand-selector.png
+
     
+    - assets/recording-page-background.jpeg
+    - assets/menu-background.jpeg
+    - assets/leaderboard-menu-background.jpg
+    - assets/recording-mode-background.jpg
+
   fonts:
     - family: Karmatic
       fonts:
         - asset: fonts/Karmatic-Regular.ttf
+
+    - family: Dialog
+      fonts:
+        - asset: fonts/game_over.ttf
