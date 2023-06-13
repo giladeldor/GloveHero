@@ -28,8 +28,6 @@ class _RecordingModePageState extends State<RecordingModePage>
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   var _isVisible = true;
 
-  double _rating = 0.0;
-
   @override
   void initState() {
     super.initState();
@@ -46,58 +44,10 @@ class _RecordingModePageState extends State<RecordingModePage>
     _onSongEndSubscription?.cancel();
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          icon: const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 40,
-          ),
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20))),
-          title: const Text(
-            "Saved Song Recording!",
-            textAlign: TextAlign.center,
-          ),
-          titleTextStyle: dialogTitleStyle,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Please Rate The Difficulty Of The Song:",
-                textAlign: TextAlign.center,
-                style: dialogTextStyle,
-              ),
-              RatingBar.builder(
-                itemCount: 3,
-                itemSize: 50,
-                itemBuilder: (context, _) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {
-                  setState(() {
-                    _rating = rating;
-                  });
-                },
-              ),
-              TextButton(
-                onPressed: () async {
-                  _songTouches.setDifficulty(_rating.toInt());
-                  final file = await _song.touchFile;
-                  await file.writeAsString(jsonEncode(_songTouches),
-                      flush: true);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-          backgroundColor: const Color.fromARGB(200, 255, 255, 255),
-        );
-      },
+      builder: (BuildContext context) => _Dialog(
+        song: _song,
+        songTouches: _songTouches,
+      ),
     ).then((value) => Navigator.of(context)
       ..maybePop()
       ..maybePop());
@@ -204,6 +154,67 @@ class _RecordingModePageState extends State<RecordingModePage>
       default:
         break;
     }
+  }
+}
+
+class _Dialog extends StatelessWidget {
+  const _Dialog({
+    Key? key,
+    required this.song,
+    required this.songTouches,
+  }) : super(key: key);
+
+  final Song song;
+  final SongTouches songTouches;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      icon: const Icon(
+        Icons.check_circle,
+        color: Colors.green,
+        size: 40,
+      ),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      title: const Text(
+        "Saved Song Recording!",
+        textAlign: TextAlign.center,
+      ),
+      titleTextStyle: dialogTitleStyle,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Please Rate The Difficulty Of The Song:",
+            textAlign: TextAlign.center,
+            style: dialogTextStyle,
+          ),
+          RatingBar.builder(
+            itemCount: 3,
+            itemSize: 50,
+            itemBuilder: (context, _) => const Icon(
+              Icons.star,
+              color: Colors.amber,
+            ),
+            onRatingUpdate: (rating) {
+              songTouches.setDifficulty(rating.toInt());
+            },
+          ),
+          TextButton(
+            onPressed: () async {
+              final file = await song.touchFile;
+              await file.writeAsString(jsonEncode(songTouches), flush: true);
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
+    );
   }
 }
 
