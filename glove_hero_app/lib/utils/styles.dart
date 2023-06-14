@@ -37,3 +37,9 @@ const Map<Input, Color> inputColors = {
   Input.input3: Colors.yellow,
   Input.input4: Colors.blue,
 };
+
+const songSelectionDialogTitleStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 50,
+  color: Colors.red,
+);

@@ -32,7 +32,6 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   late StreamSubscription<PlayerState>? _onSongEndSubscription;
   late BleInput _input;
   var _events = <_TouchEvent>[];
-  _TouchEvent? _lastEvent;
   final HashMap<Touch, _ScoreType> _scores = HashMap();
 
   @override
