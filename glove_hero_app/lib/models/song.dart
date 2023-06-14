@@ -105,11 +105,6 @@ class SongManager {
       volume: 0.4,
     ),
     Song(
-      name: "Karma Police",
-      previewSpan: PreviewSpan(start: 0, end: 27),
-      volume: 1.3,
-    ),
-    Song(
       name: "Mario Theme",
       previewSpan: PreviewSpan(start: 0, end: 17),
       volume: 1.3,
@@ -123,6 +118,11 @@ class SongManager {
       name: "My Love",
       previewSpan: PreviewSpan(start: 0, end: 19),
       volume: 0.4,
+    ),
+    Song(
+      name: "No Surprises",
+      previewSpan: PreviewSpan(start: 0, end: 25),
+      volume: 1,
     ),
     Song(
       name: "Nothing Else Matters",
