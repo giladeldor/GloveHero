@@ -1,21 +1,15 @@
-import 'dart:convert';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/song.dart';
-import 'package:glove_hero_app/models/touch.dart';
-import 'package:glove_hero_app/pages/single_player_mode_page.dart';
 import 'package:provider/provider.dart';
 import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/controller_action.dart';
-import '../utils/styles.dart';
 import '../widgets/song_card.dart';
-import 'recording_mode_page.dart';
 
 class SongSelectionMenuPage extends StatefulWidget {
-  const SongSelectionMenuPage({super.key, required this.isRecordingMode});
-  final bool isRecordingMode;
+  const SongSelectionMenuPage({super.key, required this.onSelect});
+  final Function(Song song)? onSelect;
 
   @override
   State<SongSelectionMenuPage> createState() => _SongSelectionMenuPageState();
@@ -26,12 +20,12 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
   late BleInput _input;
   final CarouselController _carouselController = CarouselController();
   int songIndex = 0;
-  late final bool _isRecordingMode;
+  late final Function(Song song)? _onSelect;
 
   @override
   void initState() {
     super.initState();
-    _isRecordingMode = widget.isRecordingMode;
+    _onSelect = widget.onSelect;
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,16 +59,6 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
     }
   }
 
-  void redirectToRecording(Song song) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) => _Dialog(
-        song: song,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -95,34 +79,8 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
             child: CarouselSlider(
               items: SongCard.songs(
                 onPressed: () {
-                  bool ok = true;
                   AudioManager.stop();
-                  if (_isRecordingMode) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RecordingModePage(
-                                song: SongManager.songs[songIndex])));
-                  } else {
-                    SongManager.songs[songIndex].touchFile.then(
-                      (file) {
-                        try {
-                          SongTouches.fromJson(
-                              jsonDecode(file.readAsStringSync()));
-                        } catch (_) {
-                          redirectToRecording(SongManager.songs[songIndex]);
-                          ok = false;
-                        }
-                        if (ok) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SinglePlayerModePage(
-                                      song: SongManager.songs[songIndex])));
-                        }
-                      },
-                    );
-                  }
+                  _onSelect?.call(SongManager.songs[songIndex]);
                 },
               ),
               carouselController: _carouselController,
@@ -169,63 +127,5 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
   onPageChange(int index, CarouselPageChangedReason reason) {
     songIndex = index;
     AudioManager.playClip(SongManager.songs[songIndex]);
-  }
-}
-
-class _Dialog extends StatelessWidget {
-  const _Dialog({
-    Key? key,
-    required this.song,
-  }) : super(key: key);
-
-  final Song song;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      title: const Text(
-        "Song Recording Doesn't Exist",
-        textAlign: TextAlign.center,
-      ),
-      titleTextStyle: songSelectionDialogTitleStyle,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Would You Like To Record It?",
-            textAlign: TextAlign.center,
-            style: dialogTextStyle,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RecordingModePage(
-                        song: song,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text("Yes"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("No"),
-              ),
-            ],
-          ),
-        ],
-      ),
-      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
-    );
   }
 }

@@ -250,16 +250,18 @@ class _CountDownState extends State<_CountDown> {
       isReverse: true,
       textStyle: titleTextStyle,
       onComplete: onComplete,
+      timeFormatterFunction: (defaultFormatterFunction, duration) =>
+          defaultFormatterFunction(duration + const Duration(seconds: 1)),
       onChange: (timeStamp) {
-        if (timeStamp == '1' && _countdown != 1) {
-          Future.delayed(Duration.zero, () {
+        if (timeStamp == '2' && _countdown != 1) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             setState(() {
               _color = Colors.yellow;
               _countdown--;
             });
           });
-        } else if (timeStamp == '0' && _countdown != 0) {
-          Future.delayed(Duration.zero, () {
+        } else if (timeStamp == '1' && _countdown != 0) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             setState(() {
               _color = const Color.fromARGB(255, 19, 250, 27);
               _countdown--;
