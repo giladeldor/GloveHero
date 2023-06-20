@@ -53,5 +53,11 @@ void loop() {
 
     else if (state == State::PracticeMode) {
         practiceMode.execute();
+
+        Input input = glove.update();
+        if (input != lastInput) {
+            lastInput = input;
+            practiceMode.touch(input, millis());
+        }
     }
 }

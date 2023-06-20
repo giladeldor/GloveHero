@@ -26,7 +26,7 @@ public:
 
     bool next(long timestamp);
 
-    ScoreType reactToTouch(long timestamp);
+    ScoreType reactToTouch(Input input, long timestamp);
 
     Position getPosition() const;
 };
@@ -48,6 +48,13 @@ private:
 
     std::function<void(long timestamp)> endGameCallback(int iteration);
 
+    std::function<void(long timestamp)> PracticeMode::showLightCallback(
+        Input input,
+        Color color);
+
+    std::function<void(long timestamp)> PracticeMode::clearLightCallback(
+        Input input);
+
     void changeToStart(long timestamp);
 
     void changeToGame(long timestamp);
@@ -60,6 +67,8 @@ private:
 
     int getInactiveTouchIdx() const;
 
+    void handleTouch(Input input, ScoreType score, long timestamp);
+
 public:
     void setup(LedManager* ledManager, InputBase* glove);
 
@@ -67,15 +76,7 @@ public:
 
     void execute();
 
-    bool detectTouch();
-
-    bool reactToTouch(Input input);
-
-    bool reactToTouch(Input input, ScoreType scoreType);
-
-    void addTouch();
-
-    void passedRound();
+    void touch(Input input, long timestamp);
 };
 
 #endif
