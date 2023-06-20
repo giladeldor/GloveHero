@@ -16,6 +16,7 @@ import '../utils/styles.dart';
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
   final Song song;
+  final int nothing;
   @override
   State<RecordingModePage> createState() => _RecordingModePageState();
 }
