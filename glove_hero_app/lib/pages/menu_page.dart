@@ -61,7 +61,7 @@ class _MenuPageState extends State<MenuPage> {
         // Navigator.pushNamed(context, "/multiplayer");
         break;
       case _MenuButtonID.recordingMode:
-        _redirectoToRecord();
+        _redirectToRecord();
         break;
       case _MenuButtonID.leaderboard:
         Navigator.of(context).push(
@@ -82,7 +82,7 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
-  void _redirectoToRecord() {
+  void _redirectToRecord() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => SongSelectionMenuPage(
