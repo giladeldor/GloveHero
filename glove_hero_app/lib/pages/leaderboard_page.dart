@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:glove_hero_app/models/high_score.dart';
 import 'package:glove_hero_app/models/song.dart';
 import 'package:glove_hero_app/utils/styles.dart';
 import '../widgets/song_card.dart';
@@ -13,7 +16,10 @@ class LeaderboardPage extends StatefulWidget {
 
 class _LeaderboardPageState extends State<LeaderboardPage> {
   final CarouselController _carouselController = CarouselController();
-  var _highScores = SongManager.getHighScores(SongManager.songs[0]);
+  Future<SongHighScores> _highScores =
+      SongManager.getHighScores(SongManager.songs[0]);
+
+  final List<String> stringFromIndex = ["ST", "ND", "RD", "TH"];
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/leaderboard-menu-background.jpg"),
+            image: AssetImage("assets/leaderboard-background.jfif"),
             fit: BoxFit.cover,
           ),
         ),
@@ -31,7 +37,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             child: FittedBox(
               child: Text(
                 "Leaderboard",
-                style: titleTextStyle,
+                style: leaderBoardTitle,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -46,7 +52,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 }),
                 carouselController: _carouselController,
                 options: CarouselOptions(
-                  height: 400,
+                  height: 350,
                   aspectRatio: 16 / 9,
                   viewportFraction: 0.8,
                   initialPage: 0,
@@ -64,19 +70,85 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               ),
             ),
           ),
-          Padding(
-              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
-              child: Table(
-                  border: TableBorder.all(
-                      color: const Color.fromARGB(255, 0, 0, 0), width: 1.5),
-                  children: _highScores.scores
-                      .map(
-                        (score) => TableRow(children: [
-                          Center(child: Text(score.name)),
-                          Center(child: Text(castHighScore(score.score))),
-                        ]),
-                      )
-                      .toList()))
+          FutureBuilder(
+            future: _highScores,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                  child: Table(
+                    defaultColumnWidth: const IntrinsicColumnWidth(),
+                    children: snapshot.data!.scores.indexed.map(
+                      (element) {
+                        final (index, score) = element;
+                        return TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Text(
+                                (index + 1).toString() +
+                                    stringFromIndex[min(index, 3)],
+                                textAlign: TextAlign.center,
+                                style: highScoreTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Center(
+                                child: Text(
+                                  score.name,
+                                  style: highScoreTextStyle,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Center(
+                                child: Text(castHighScore(score.score),
+                                    style: highScoreTextStyle),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ).toList()
+                      ..insert(
+                        0,
+                        const TableRow(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Text(
+                                "RANK",
+                                style: highScoreTitle,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(
+                                child: Text(
+                                  "NAME",
+                                  style: highScoreTitle,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(
+                                child: Text("SCORE", style: highScoreTitle),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ),
+                );
+              } else {
+                return const Text("Wait");
+              }
+            },
+          )
         ]),
       ),
     );
