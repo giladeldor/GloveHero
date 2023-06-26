@@ -31,9 +31,12 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   late List<Touch>? _touches;
   late StreamSubscription<PlayerState>? _onSongEndSubscription;
   late BleInput _input;
+  late BleModel _bleModel;
   var _events = <_TouchEvent>[];
-  _TouchEvent? _lastEvent;
+  Touch? _longTouch;
+  int _lastUpdate = 0;
   final HashMap<Touch, _ScoreType> _scores = HashMap();
+  Future<void> _colorFuture = Future.value();
 
   @override
   void initState() {
@@ -59,13 +62,14 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
 
       createTicker((_) {
         // Redraw each frame.
-        setState(() {});
         _tick();
+        setState(() {});
       }).start();
     });
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bleModel = context.read<BleModel>();
       _input = context.read<BleInput>();
       _input.addPressListener(_handleInput);
     });
@@ -149,6 +153,8 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     if (_touches!.isEmpty) return;
 
     for (var event in events) {
+      _longTouch = null;
+
       final nextTouch = _touches!.indexed.where((element) {
         final (_, touch) = element;
         return touch.input == event.input;
@@ -159,19 +165,62 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
       final diff = (touch.timeStamp - event.timestamp).abs();
       final scoreType = _ScoreType.fromDiff(diff, touchOffset);
 
-      if (scoreType == _ScoreType.miss) continue; // TODO: change leds + score
+      if (scoreType != _ScoreType.miss && touch.type == TouchType.long) {
+        _longTouch = touch;
+        _lastUpdate = timeStamp;
+      }
 
       _scores[touch] = scoreType;
       _score += scoreType.score;
-      // TODO: change leds
-      _touches!.removeRange(0, index + 1);
+
+      _setColor(touch, scoreType);
+
+      if (scoreType != _ScoreType.miss) {
+        _touches!.removeRange(0, index + 1);
+      }
+    }
+
+    if (_longTouch != null) {
+      final endStamp = _longTouch!.timeStamp + _longTouch!.duration!;
+      if (timeStamp > endStamp) {
+        _longTouch = null;
+      } else {
+        final elapsed = timeStamp - _lastUpdate;
+        if (elapsed >= 50) {
+          _lastUpdate = timeStamp;
+          final score = (elapsed / 50).floor() * 10;
+          _score += score;
+        }
+      }
     }
 
     while (_touches!.isNotEmpty &&
         _touches!.first.timeStamp < timeStamp - touchOffset) {
       final touch = _touches!.removeAt(0);
       _scores[touch] = _ScoreType.miss;
+
+      _setColor(touch, _ScoreType.miss);
     }
+  }
+
+  void _setColor(Touch touch, _ScoreType scoreType) {
+    _colorFuture = _colorFuture
+        .then(
+      (_) => _bleModel.setColor(
+        input: touch.input,
+        color: scoreType.color,
+      ),
+    )
+        .then(
+      (_) async {
+        final delay = touch.type == TouchType.long ? touch.duration! : 100;
+        await Future.delayed(Duration(milliseconds: delay));
+        _bleModel.setColor(
+          input: touch.input,
+          color: Colors.black,
+        );
+      },
+    );
   }
 }
 
@@ -301,5 +350,11 @@ enum _ScoreType {
         _ScoreType.good => goodScore,
         _ScoreType.bad => badScore,
         _ScoreType.miss => missScore,
+      };
+
+  Color get color => switch (this) {
+        _ScoreType.good => const Color.fromARGB(255, 0, 255, 0),
+        _ScoreType.bad => const Color.fromARGB(255, 0, 0, 255),
+        _ScoreType.miss => const Color.fromARGB(255, 255, 0, 0),
       };
 }

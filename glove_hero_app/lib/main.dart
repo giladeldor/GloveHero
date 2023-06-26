@@ -42,7 +42,7 @@ class GloveHeroApp extends StatelessWidget {
         // child: MenuPage(),
         //child: RecordingModePage(song: SongManager.songs[5]),
         child: SinglePlayerModePage(
-          song: SongManager.songs[5],
+          song: SongManager.songs[22],
         ),
       ),
       debugShowCheckedModeBanner: false,

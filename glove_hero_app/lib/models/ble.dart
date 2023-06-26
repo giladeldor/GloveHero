@@ -111,6 +111,25 @@ class BleModel {
     );
   }
 
+  void setColor({required Input input, required Color color}) {
+    switch (input) {
+      case Input.input1:
+        pinkyColor = color;
+        break;
+      case Input.input2:
+        ringColor = color;
+        break;
+      case Input.input3:
+        middleColor = color;
+        break;
+      case Input.input4:
+        indexColor = color;
+        break;
+      default:
+        break;
+    }
+  }
+
   Future<Color> _getColorValue(QualifiedCharacteristic? characteristic) async {
     final value = await _ble.readCharacteristic(characteristic!);
     return Color.fromARGB(
