@@ -43,17 +43,21 @@ private:
     long timePerRound;
     long lastUpdate;
     State state;
+    Input lastInput;
 
     std::function<void(long timestamp)> startGameCallback(int iteration);
 
     std::function<void(long timestamp)> endGameCallback(int iteration);
 
-    std::function<void(long timestamp)> PracticeMode::showLightCallback(
-        Input input,
-        Color color);
+    std::function<void(long timestamp)> showLightCallback(Input input,
+                                                          Color color);
 
-    std::function<void(long timestamp)> PracticeMode::clearLightCallback(
-        Input input);
+    std::function<void(long timestamp)> clearLightsCallback(Input input);
+
+    std::function<void(long timestamp)> setLightCallback(Input input, int pos);
+
+    std::function<void(long timestamp)> clearLightCallback(Input input,
+                                                           int pos);
 
     void changeToStart(long timestamp);
 

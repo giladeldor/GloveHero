@@ -11,8 +11,8 @@
 
 enum class State { PracticeMode, Connected };
 
-// static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
-static KeyboardInput glove;
+static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
+// static KeyboardInput glove;
 
 static Input lastInput;
 static State state;
@@ -53,11 +53,5 @@ void loop() {
 
     else if (state == State::PracticeMode) {
         practiceMode.execute();
-
-        Input input = glove.update();
-        if (input != lastInput) {
-            lastInput = input;
-            practiceMode.touch(input, millis());
-        }
     }
 }
