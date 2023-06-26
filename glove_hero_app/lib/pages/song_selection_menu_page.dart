@@ -22,6 +22,11 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
   int songIndex = 0;
   late final Function(Song song)? _onSelect;
 
+  void onPress() {
+    AudioManager.stop();
+    _onSelect?.call(SongManager.songs[songIndex]);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +55,7 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
         _carouselController.previousPage();
         break;
       case MenuAction.select:
+        onPress();
         break;
       case MenuAction.back:
         Navigator.of(context).pop();
@@ -78,10 +84,7 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
             alignment: Alignment.center,
             child: CarouselSlider(
               items: SongCard.songs(
-                onPressed: () {
-                  AudioManager.stop();
-                  _onSelect?.call(SongManager.songs[songIndex]);
-                },
+                onPressed: onPress,
               ),
               carouselController: _carouselController,
               options: CarouselOptions(

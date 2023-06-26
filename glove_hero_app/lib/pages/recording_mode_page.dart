@@ -54,7 +54,8 @@ class _RecordingModePageState extends State<RecordingModePage>
   }
 
   void _handleInput(Input input) {
-    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
+    print("handleInput");
+    if (context.mounted && !(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
     // TODO: activate LEDs
@@ -73,6 +74,7 @@ class _RecordingModePageState extends State<RecordingModePage>
     return WillPopScope(
       onWillPop: () {
         _onSongEndSubscription?.cancel();
+        _input.removePressListener((_handleInput));
         AudioManager.stop();
 
         return Future.value(true);

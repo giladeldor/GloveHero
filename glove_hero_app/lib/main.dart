@@ -37,12 +37,12 @@ class GloveHeroApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SafeArea(
-        // child: MenuPage(),
+      home: const SafeArea(
+        child: MenuPage(),
         //child: RecordingModePage(song: SongManager.songs[5]),
-        child: SinglePlayerModePage(
-          song: SongManager.songs[22],
-        ),
+        //child: SinglePlayerModePage(
+        //  song: SongManager.songs[22],
+        //),
       ),
       debugShowCheckedModeBanner: false,
     );

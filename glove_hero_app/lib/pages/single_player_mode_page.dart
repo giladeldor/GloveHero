@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:glove_hero_app/models/touch.dart';
 import 'package:glove_hero_app/utils/painter.dart';
 import 'package:glove_hero_app/utils/styles.dart';
@@ -38,6 +39,12 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   int _lastUpdate = 0;
   final HashMap<Touch, _ScoreType> _scores = HashMap();
   Future<void> _colorFuture = Future.value();
+  late Ticker _ticker;
+
+  void endSong() {
+    _onSongEndSubscription?.cancel();
+    Navigator.of(context).maybePop();
+  }
 
   @override
   void initState() {
@@ -61,12 +68,16 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
       _touches = _songTouches!.touches.toList();
 
       AudioManager.playSong(_song);
+      _onSongEndSubscription = AudioManager.onSongEnd(
+        endSong,
+      );
 
-      createTicker((_) {
+      _ticker = createTicker((_) {
         // Redraw each frame.
         _tick();
         setState(() {});
-      }).start();
+      });
+      _ticker.start();
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -120,16 +131,18 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   Future<bool> _onWillPop() async {
     AudioManager.stop();
     _onSongEndSubscription?.cancel();
+    _input.removePressListener(_handleInput);
 
     return true;
   }
 
   @override
   void dispose() {
-    super.dispose();
-
+    _ticker.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _input.removePressListener(_handleInput);
+
+    super.dispose();
   }
 
   void _handleInput(Input input) {
