@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
-import 'package:glove_hero_app/pages/recording_mode_menu_page.dart';
+import 'package:glove_hero_app/pages/song_selection_menu_page.dart';
 import 'package:provider/provider.dart';
 import '../models/controller_action.dart';
+import '../models/song.dart';
+import '../models/touch.dart';
 import '../utils/styles.dart';
 import 'leaderboard_page.dart';
+import 'recording_mode_page.dart';
+import 'single_player_mode_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -46,19 +52,13 @@ class _MenuPageState extends State<MenuPage> {
   void _handleSelect(_MenuButtonID? id) {
     switch (id) {
       case _MenuButtonID.singlePlayer:
-        // Navigator.pushNamed(context, "/single-player");
+        _redirectToSinglePlayer();
         break;
       case _MenuButtonID.multiplayer:
         // Navigator.pushNamed(context, "/multiplayer");
         break;
       case _MenuButtonID.recordingMode:
-        Future.microtask(() {
-          return Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const RecordingModeMenuPage(),
-            ),
-          );
-        });
+        _redirectoToRecord();
         break;
       case _MenuButtonID.leaderboard:
         Navigator.of(context).push(
@@ -75,6 +75,54 @@ class _MenuPageState extends State<MenuPage> {
         break;
       default:
     }
+  }
+
+  void _redirectoToRecord() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SongSelectionMenuPage(
+          onSelect: (song) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RecordingModePage(song: song),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _redirectToSinglePlayer() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SongSelectionMenuPage(
+          onSelect: (song) {
+            song.touchFile.then(
+              (file) {
+                try {
+                  SongTouches.fromJson(jsonDecode(file.readAsStringSync()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SinglePlayerModePage(song: song),
+                    ),
+                  );
+                } catch (_) {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) =>
+                        _RedirectToRecordDialog(song: song),
+                  );
+                }
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -116,14 +164,15 @@ class _MenuPageState extends State<MenuPage> {
                   padding: buttonPadding,
                   child: _MenuButton(
                     id: _MenuButtonID.singlePlayer,
-                    onPressed: connection.state == BleConnectionState.connected
-                        ? () {
-                            setState(() {
-                              _selectedButton = null;
-                            });
-                            _handleSelect(_MenuButtonID.singlePlayer);
-                          }
-                        : null,
+                    onPressed:
+                        true || connection.state == BleConnectionState.connected
+                            ? () {
+                                setState(() {
+                                  _selectedButton = null;
+                                });
+                                _handleSelect(_MenuButtonID.singlePlayer);
+                              }
+                            : null,
                     selected: _selectedButton,
                   ),
                 ),
@@ -280,5 +329,72 @@ enum _MenuButtonID {
   _MenuButtonID get down {
     final idx = (index + 1) % _MenuButtonID.values.length;
     return _MenuButtonID.values[idx];
+  }
+}
+
+class _RedirectToRecordDialog extends StatelessWidget {
+  const _RedirectToRecordDialog({
+    Key? key,
+    required this.song,
+  }) : super(key: key);
+
+  final Song song;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      title: const Text(
+        "Song Recording Doesn't Exist",
+        textAlign: TextAlign.center,
+      ),
+      titleTextStyle: songSelectionDialogTitleStyle,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Would You Like To Record It?",
+            textAlign: TextAlign.center,
+            style: dialogTextStyle,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecordingModePage(
+                        song: song,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SinglePlayerModePage(
+                        song: song,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text("No"),
+              ),
+            ],
+          ),
+        ],
+      ),
+      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
+    );
   }
 }

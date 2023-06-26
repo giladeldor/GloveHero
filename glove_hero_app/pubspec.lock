@@ -52,10 +52,11 @@ packages:
   circular_countdown_timer:
     dependency: "direct main"
     description:
-      name: circular_countdown_timer
-      sha256: "9ba5fbc076cedbcbf6190ed86762e679f43d7c67cdd903ea34df059dabdc08d4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: on_change_fix
+      resolved-ref: "277068fa1707700370b7abd47311c2fe9deabe3c"
+      url: "https://github.com/ceranco/circular_countdown_timer"
+    source: git
     version: "0.2.3"
   clock:
     dependency: transitive

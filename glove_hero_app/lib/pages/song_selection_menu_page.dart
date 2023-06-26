@@ -6,24 +6,26 @@ import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/controller_action.dart';
 import '../widgets/song_card.dart';
-import 'recording_mode_page.dart';
 
-class RecordingModeMenuPage extends StatefulWidget {
-  const RecordingModeMenuPage({super.key});
+class SongSelectionMenuPage extends StatefulWidget {
+  const SongSelectionMenuPage({super.key, required this.onSelect});
+  final Function(Song song)? onSelect;
 
   @override
-  State<RecordingModeMenuPage> createState() => _RecordingModeMenuPageState();
+  State<SongSelectionMenuPage> createState() => _SongSelectionMenuPageState();
 }
 
-class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
+class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
     with WidgetsBindingObserver {
   late BleInput _input;
   final CarouselController _carouselController = CarouselController();
   int songIndex = 0;
+  late final Function(Song song)? _onSelect;
 
   @override
   void initState() {
     super.initState();
+    _onSelect = widget.onSelect;
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,11 +80,7 @@ class _RecordingModeMenuPageState extends State<RecordingModeMenuPage>
               items: SongCard.songs(
                 onPressed: () {
                   AudioManager.stop();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RecordingModePage(
-                              song: SongManager.songs[songIndex])));
+                  _onSelect?.call(SongManager.songs[songIndex]);
                 },
               ),
               carouselController: _carouselController,

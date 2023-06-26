@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:glove_hero_app/models/song.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
-import 'package:glove_hero_app/pages/single_player_mode_page.dart';
 import 'package:provider/provider.dart';
 import 'models/ble.dart';
+import 'models/song.dart';
 import 'pages/menu_page.dart';
+import 'pages/single_player_mode_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

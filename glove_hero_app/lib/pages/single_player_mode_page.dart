@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -52,8 +53,9 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
       } catch (_) {
         _songTouches = SongTouches();
         for (var i = 0; i < 50; i++) {
-          _songTouches!.addTouch(
-              Touch.regular(input: Input.input1, timeStamp: i * 1000));
+          _songTouches!.addTouch(Touch.regular(
+              input: Input.fromIdx(Random().nextInt(4)),
+              timeStamp: i * Random().nextInt(500) + 100));
         }
       }
       _touches = _songTouches!.touches.toList();
