@@ -27,8 +27,6 @@ class _RecordingModePageState extends State<RecordingModePage>
   final SongTouches _songTouches = SongTouches();
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   var _isVisible = true;
-  int countdown = 2;
-  double _rating = 0.0;
 
   @override
   void initState() {

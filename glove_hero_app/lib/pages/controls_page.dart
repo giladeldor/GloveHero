@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../styles.dart';
+import '../utils/styles.dart';
 
 class ControlsPage extends StatelessWidget {
   const ControlsPage({super.key});
