@@ -74,6 +74,7 @@ flutter:
     - assets/song-art/
     - assets/
     - assets/backgrounds/
+    - assets/default-touches/
   fonts:
     - family: Karmatic
       fonts:

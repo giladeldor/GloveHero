@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'high_score.dart';
@@ -21,8 +22,14 @@ class Song {
   String get audioAsset => "assets/audio/$_assetTitle.mp3";
   String get artAsset => "assets/song-art/$_assetTitle.jpg";
   Future<File> get touchFile async {
-    return File("${await _localDir}/touches/$_assetTitle.json")
-        .create(recursive: true);
+    final file = File("${await _localDir}/touches/$_assetTitle.json");
+    if (await file.exists() && await file.length() > 0) return file;
+
+    await file.create(recursive: true);
+    await file.writeAsString(await rootBundle
+        .loadString("assets/default-touches/$_assetTitle.json"));
+
+    return file;
   }
 
   Future<File> get highScoreFile async {

@@ -114,7 +114,8 @@ class _MenuPageState extends State<MenuPage> {
                       builder: (context) => SinglePlayerModePage(song: song),
                     ),
                   );
-                } catch (_) {
+                } catch (e) {
+                  print("exception: $e");
                   showDialog(
                     barrierDismissible: false,
                     context: context,
