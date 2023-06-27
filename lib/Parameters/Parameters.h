@@ -1,7 +1,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#define LED_PIN 5
+#define LED_PIN 25
 #define NUM_PIXELS 12
 #define NUM_PIXELS_PER_INPUT NUM_PIXELS / NUM_INPUTS
 #define BAUD_RATE 9600
@@ -11,9 +11,9 @@
 #define RING_LED_CHARACTERISTIC_UUID "90e39454-d50d-4d86-9595-0e05bd709709"
 #define MIDDLE_LED_CHARACTERISTIC_UUID "9bcc732e-c684-42c8-8229-33ba787d7ba6"
 #define INDEX_LED_CHARACTERISTIC_UUID "e6297d4b-cfb8-4a9a-a650-3ce33b9cbef0"
-#define PINKY 27
-#define RING 14
-#define MIDDLE 12
-#define INDEX 13
+#define PINKY 26
+#define RING 27
+#define MIDDLE 14
+#define INDEX 12
 
 #endif
