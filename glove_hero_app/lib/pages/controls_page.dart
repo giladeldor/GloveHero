@@ -17,16 +17,19 @@ class ControlsPage extends StatelessWidget {
           ),
         ),
       ),
-      const Padding(
-        padding: EdgeInsets.symmetric(vertical: 50, horizontal: 8),
-        child: FittedBox(
-          child: Text(
-            "Controls",
-            style: titleTextStyle,
-            textAlign: TextAlign.center,
+      const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FittedBox(
+            alignment: Alignment.center,
+            child: Text(
+              "Controls",
+              style: titleTextStyle,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      )
+        ],
+      ),
     ]);
   }
 }

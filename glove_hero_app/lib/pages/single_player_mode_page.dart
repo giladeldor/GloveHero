@@ -9,6 +9,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:glove_hero_app/models/touch.dart';
 import 'package:glove_hero_app/utils/painter.dart';
 import 'package:glove_hero_app/utils/styles.dart';
+import 'package:glove_hero_app/widgets/countdown.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +29,8 @@ class SinglePlayerModePage extends StatefulWidget {
 class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _score = 0;
+
+  bool _isVisible = true;
   Song get _song => widget.song;
   SongTouches? _songTouches;
   late List<Touch>? _touches;
@@ -46,10 +49,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     Navigator.of(context).maybePop();
   }
 
-  @override
-  void initState() {
-    super.initState();
-
+  void startSong() {
     _song.touchFile.then((file) {
       try {
         _songTouches = SongTouches.fromJson(
@@ -79,6 +79,11 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
       });
       _ticker.start();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -103,6 +108,20 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
           ),
           child: Stack(
             children: [
+              _isVisible
+                  ? Flexible(
+                      child: Center(
+                        child: CountDown(
+                          onComplete: () {
+                            setState(() {
+                              _isVisible = false;
+                              startSong();
+                            });
+                          },
+                        ),
+                      ),
+                    )
+                  : const Spacer(),
               Consumer<BleInput>(
                 builder: (context, input, child) {
                   return CustomPaint(
