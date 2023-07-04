@@ -76,7 +76,7 @@ Input GloveInput::update() {
     Input state = Input::None;
     for (int i = 0; i < NUM_INPUTS; i++) {
         finger_state[i] =
-            touchRead(pins[i]) < 15 ? InputState::Active : InputState::Inactive;
+            touchRead(pins[i]) < 5 ? InputState::Active : InputState::Inactive;
         if (finger_state[i] == InputState::Active) {
             state = static_cast<Input>(i);
         }
