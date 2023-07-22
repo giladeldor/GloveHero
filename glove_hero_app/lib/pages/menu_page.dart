@@ -170,15 +170,14 @@ class _MenuPageState extends State<MenuPage> {
                   padding: buttonPadding,
                   child: _MenuButton(
                     id: _MenuButtonID.singlePlayer,
-                    onPressed:
-                        true || connection.state == BleConnectionState.connected
-                            ? () {
-                                setState(() {
-                                  _selectedButton = null;
-                                });
-                                _handleSelect(_MenuButtonID.singlePlayer);
-                              }
-                            : null,
+                    onPressed: connection.state == BleConnectionState.connected
+                        ? () {
+                            setState(() {
+                              _selectedButton = null;
+                            });
+                            _handleSelect(_MenuButtonID.singlePlayer);
+                          }
+                        : null,
                     selected: _selectedButton,
                   ),
                 ),
@@ -200,18 +199,17 @@ class _MenuPageState extends State<MenuPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: _MenuButton(
-                      id: _MenuButtonID.recordingMode,
-                      onPressed: /*connection.state == BleConnectionState.connected
-                        ? */
-                          () {
-                        setState(() {
-                          _selectedButton = null;
-                        });
-                        _handleSelect(_MenuButtonID.recordingMode);
-                      }
-                      /*: null,
-                    selected: _selectedButton,*/
-                      ),
+                    id: _MenuButtonID.recordingMode,
+                    onPressed: connection.state == BleConnectionState.connected
+                        ? () {
+                            setState(() {
+                              _selectedButton = null;
+                            });
+                            _handleSelect(_MenuButtonID.recordingMode);
+                          }
+                        : null,
+                    selected: _selectedButton,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

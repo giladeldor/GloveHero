@@ -26,8 +26,10 @@ class Song {
     if (await file.exists() && await file.length() > 0) return file;
 
     await file.create(recursive: true);
-    await file.writeAsString(await rootBundle
-        .loadString("assets/default-touches/$_assetTitle.json"));
+    try {
+      await file.writeAsString(await rootBundle
+          .loadString("assets/default-touches/$_assetTitle.json"));
+    } catch (_) {}
 
     return file;
   }
