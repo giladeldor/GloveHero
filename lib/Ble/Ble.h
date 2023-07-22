@@ -43,7 +43,7 @@ public:
 
     void setInput(Input input);
 
-    Color getColor(Input input, int index);
+    Color getColor(Input input);
 };
 
 #endif

@@ -21,13 +21,12 @@ std::function<void(long timestamp)> PracticeMode::startGameCallback(
     }
 
     if (iteration == 3) {
-        return [=](long) { ledManager->clearAll(); };
+        return [=](long) { ledManager->clear(); };
     }
 
     return [=](long) {
         for (int j = 0; j < NUM_INPUTS; j++) {
-            ledManager->set(static_cast<Input>(j), iteration,
-                            colors[iteration]);
+            ledManager->set(static_cast<Input>(j), colors[iteration]);
         }
     };
 }
@@ -41,32 +40,32 @@ std::function<void(long timestamp)> PracticeMode::endGameCallback(
     }
 
     if (iteration % 2 == 0) {
-        return [=](long) { ledManager->fillAll(color.red, 0, 0); };
+        return [=](long) { ledManager->fill(color.red, 0, 0); };
     }
 
-    return [=](long) { ledManager->clearAll(); };
+    return [=](long) { ledManager->clear(); };
 }
 
 std::function<void(long timestamp)> PracticeMode::showLightCallback(
     Input input,
     Color color) {
-    return [=](long) { ledManager->fillFinger(input, color); };
+    return [=](long) { ledManager->set(input, color); };
 }
 
 std::function<void(long timestamp)> PracticeMode::clearLightsCallback(
     Input input) {
-    return [=](long) { ledManager->clearFinger(input); };
+    return [=](long) { ledManager->clear(input); };
 }
 
 std::function<void(long timestamp)> PracticeMode::setLightCallback(Input input,
                                                                    int pos) {
-    return [=](long) { ledManager->set(input, pos, {255, 255, 255}); };
+    return [=](long) { ledManager->set(input, {255, 255, 255}); };
 }
 
 std::function<void(long timestamp)> PracticeMode::clearLightCallback(
     Input input,
     int pos) {
-    return [=](long) { ledManager->set(input, pos, {0, 0, 0}); };
+    return [=](long) { ledManager->clear(input); };
 }
 
 void PracticeMode::changeToStart(long timestamp) {
@@ -126,7 +125,7 @@ void PracticeMode::setup(LedManager* ledManager, InputBase* glove) {
 void PracticeMode::startGame() {
     long timestamp = millis();
     timePerRound = defaultTimePerRound;
-    ledManager->clearAll();
+    ledManager->clear();
     scheduler.clear();
 
     // Initialize touches.

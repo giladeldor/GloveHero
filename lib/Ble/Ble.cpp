@@ -49,7 +49,12 @@ void Ble::setInput(Input input) {
     touchCharacteristic->notify();
 }
 
-Color Ble::getColor(Input input, int index) {
-    auto data = ledCharacteristics[static_cast<int>(input)]->getValue();
-    return Color::fromData(data.c_str() + index * 3);
+Color Ble::getColor(Input input) {
+    int index = toInt(input);
+    if (index < 0) {
+        return Color(0, 0, 0);
+    }
+
+    auto data = ledCharacteristics[index]->getValue();
+    return Color::fromData(data.c_str());
 }

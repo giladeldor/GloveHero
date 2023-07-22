@@ -46,12 +46,11 @@ void loop() {
 
         // Update leds according to characteristics.
         for (int i = 0; i < NUM_INPUTS; i++) {
-            for (int j = 0; j < 3; j++) {
-                Input input = static_cast<Input>(i);
-                Color color = ble.getColor(input, j);
-                ledManager.set(input, j, color);
-            }
+            Input input = static_cast<Input>(i);
+            Color color = ble.getColor(input);
+            ledManager.set(input, color);
         }
+        ledManager.show();
     }
 
     else if (state == State::PracticeMode) {

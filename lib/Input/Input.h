@@ -7,6 +7,10 @@
 
 enum class Input { None = -1, Input1, Input2, Input3, Input4 };
 
+static int toInt(Input input) {
+    return static_cast<int>(input);
+}
+
 enum class InputState {
     Active,
     Inactive,
