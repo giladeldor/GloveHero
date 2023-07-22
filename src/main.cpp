@@ -11,7 +11,10 @@
 
 enum class State { PracticeMode, Connected };
 
-static GloveInput glove(PINKY, RING, MIDDLE, INDEX);
+static GloveInput glove(PINKY_PIN,
+                        RING_FINGER_PIN,
+                        MIDDLE_FINGER_PIN,
+                        INDEX_PIN);
 // static KeyboardInput glove;
 
 static Input lastInput;

@@ -5,12 +5,8 @@
  * 27: Index finger bottom
  */
 
+#include <Parameters.h>
 #include "Arduino.h"
-
-#define PINKY_PIN 13
-#define RING_FINGER_PIN 12
-#define MIDDLE_FINGER_PIN 14
-#define INDEX_PIN 27
 
 std::array<int, 4> pins = {
     PINKY_PIN,

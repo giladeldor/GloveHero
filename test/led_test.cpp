@@ -1,14 +1,9 @@
 #include <Adafruit_NeoPixel.h>
-
-#define LED_PIN 26
-#define NUM_PIXELS 4
-#define BAUD_RATE 9600
+#include <Parameters.h>
 
 Adafruit_NeoPixel pixels(NUM_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
-    Serial.begin(BAUD_RATE);
-
     pixels.setBrightness(30);
     pixels.begin();
 }
