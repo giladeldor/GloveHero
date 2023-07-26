@@ -2,11 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
-
-import 'package:glove_hero_app/pages/controls_page.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
-import 'package:glove_hero_app/pages/song_selection_menu_page.dart';
 import 'package:provider/provider.dart';
+import 'controls_page.dart';
 import '../models/controller_action.dart';
 import '../models/song.dart';
 import '../models/touch.dart';
@@ -14,6 +11,7 @@ import '../utils/styles.dart';
 import 'leaderboard_page.dart';
 import 'recording_mode_page.dart';
 import 'single_player_mode_page.dart';
+import 'song_selection_menu_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
