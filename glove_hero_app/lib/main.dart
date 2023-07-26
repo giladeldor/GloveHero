@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:glove_hero_app/models/song.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
 import 'package:provider/provider.dart';
 import 'models/ble.dart';
 import 'pages/menu_page.dart';
@@ -39,7 +37,12 @@ class GloveHeroApp extends StatelessWidget {
       ),
       home: const SafeArea(
         child: MenuPage(),
+        //child: RecordingModePage(song: SongManager.songs[5]),
+        //child: SinglePlayerModePage(
+        //  song: SongManager.songs[5],
+        //),
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

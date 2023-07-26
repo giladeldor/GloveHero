@@ -7,18 +7,31 @@
 
 enum class Input { None = -1, Input1, Input2, Input3, Input4 };
 
+static int toInt(Input input) {
+    return static_cast<int>(input);
+}
+
 enum class InputState {
     Active,
     Inactive,
 };
 
-class KeyboardInput {
+class InputBase {
+public:
+    virtual ~InputBase() = default;
+
+    virtual Input update() = 0;
+
+    virtual InputState inputState(Input input) const = 0;
+};
+
+class KeyboardInput final : public InputBase {
 public:
     KeyboardInput();
 
-    Input update();
+    virtual Input update() override;
 
-    InputState inputState(Input input) const;
+    virtual InputState inputState(Input input) const override;
 
 private:
     enum class Key { L = 0, K, J, H };
@@ -28,13 +41,13 @@ private:
     Input current;
 };
 
-class GloveInput {
+class GloveInput final : public InputBase {
 public:
     GloveInput(int pinky_pin, int ring_pin, int middle_pin, int index_pin);
 
-    Input update();
+    virtual Input update() override;
 
-    InputState inputState(Input input) const;
+    virtual InputState inputState(Input input) const override;
 
 private:
     enum class Finger { Pinky = 0, Ring, Middle, Index };

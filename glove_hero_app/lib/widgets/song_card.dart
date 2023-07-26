@@ -1,6 +1,7 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/song.dart';
-import '../styles.dart';
+import '../utils/styles.dart';
 
 class SongCard extends StatelessWidget {
   const SongCard({
@@ -49,14 +50,14 @@ class SongCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: FittedBox(
-                  child: Text(
-                    songName,
-                    textAlign: TextAlign.center,
-                    style: menuButtonTextStyle.copyWith(
-                      color: Colors.black,
-                      fontSize: 25,
-                    ),
+                child: AutoSizeText(
+                  songName,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  wrapWords: false,
+                  style: menuButtonTextStyle.copyWith(
+                    color: Colors.black,
+                    fontSize: 25,
                   ),
                 ),
               )

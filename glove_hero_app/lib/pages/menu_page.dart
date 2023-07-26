@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
 
 import 'package:glove_hero_app/pages/controls_page.dart';
-import 'package:glove_hero_app/pages/recording_mode_page.dart';
-import 'package:glove_hero_app/pages/recording_mode_menu_page.dart';
 import 'package:provider/provider.dart';
 import '../models/controller_action.dart';
-import '../styles.dart';
+import '../utils/styles.dart';
 import 'leaderboard_page.dart';
+import 'song_selection_menu_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -49,7 +48,13 @@ class _MenuPageState extends State<MenuPage> {
   void _handleSelect(_MenuButtonID? id) {
     switch (id) {
       case _MenuButtonID.singlePlayer:
-        // Navigator.pushNamed(context, "/single-player");
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const SongSelectionMenuPage(
+              isRecordingMode: false,
+            ),
+          ),
+        );
         break;
       case _MenuButtonID.multiplayer:
         // Navigator.pushNamed(context, "/multiplayer");
@@ -58,7 +63,9 @@ class _MenuPageState extends State<MenuPage> {
         Future.microtask(() {
           return Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const RecordingModeMenuPage(),
+              builder: (context) => const SongSelectionMenuPage(
+                isRecordingMode: true,
+              ),
             ),
           );
         });
@@ -121,14 +128,15 @@ class _MenuPageState extends State<MenuPage> {
                   padding: buttonPadding,
                   child: _MenuButton(
                     id: _MenuButtonID.singlePlayer,
-                    onPressed: connection.state == BleConnectionState.connected
-                        ? () {
-                            setState(() {
-                              _selectedButton = null;
-                            });
-                            _handleSelect(_MenuButtonID.singlePlayer);
-                          }
-                        : null,
+                    onPressed:
+                        true || connection.state == BleConnectionState.connected
+                            ? () {
+                                setState(() {
+                                  _selectedButton = null;
+                                });
+                                _handleSelect(_MenuButtonID.singlePlayer);
+                              }
+                            : null,
                     selected: _selectedButton,
                   ),
                 ),

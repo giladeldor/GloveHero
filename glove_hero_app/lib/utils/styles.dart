@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/ble.dart';
 
 const titleTextStyle = TextStyle(
   fontFamily: "Karmatic",
@@ -28,6 +29,19 @@ const dialogTextStyle = TextStyle(
   fontFamily: "Dialog",
   fontSize: 35,
   color: Colors.black,
+);
+
+const Map<Input, Color> inputColors = {
+  Input.input1: Colors.green,
+  Input.input2: Colors.red,
+  Input.input3: Colors.yellow,
+  Input.input4: Colors.blue,
+};
+
+const songSelectionDialogTitleStyle = TextStyle(
+  fontFamily: "Dialog",
+  fontSize: 50,
+  color: Colors.red,
 );
 
 const highScoreTextStyle = TextStyle(

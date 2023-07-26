@@ -56,7 +56,6 @@ class SongManager {
     ),
     Song(
       name: "All My Life",
-      title: "All My\nLife",
       previewSpan: PreviewSpan(start: 6, end: 17),
       volume: 0.5,
     ),
@@ -67,13 +66,11 @@ class SongManager {
     ),
     Song(
       name: "Bohemian Rhapsody",
-      title: "Bohemian\nRhapsody",
       previewSpan: PreviewSpan(start: 50, end: 70),
       volume: 0.7,
     ),
     Song(
       name: "Come as You Are",
-      title: "Come as\nYou Are",
       previewSpan: PreviewSpan(start: 0, end: 17),
       volume: 0.5,
     ),
@@ -84,7 +81,6 @@ class SongManager {
     ),
     Song(
       name: "Freed from Desire",
-      title: "Freed from\nDesire",
       previewSpan: PreviewSpan(start: 58, end: 73),
       volume: 0.7,
     ),
@@ -95,7 +91,6 @@ class SongManager {
     ),
     Song(
       name: "I Approached Ido",
-      title: "I Approached\nIdo",
       previewSpan: PreviewSpan(start: 40, end: 60),
       volume: 0.5,
     ),
@@ -126,7 +121,6 @@ class SongManager {
     ),
     Song(
       name: "Nothing Else Matters",
-      title: "Nothing Else\nMatters",
       previewSpan: PreviewSpan(start: 0, end: 27),
       volume: 2,
     ),
@@ -137,7 +131,6 @@ class SongManager {
     ),
     Song(
       name: "Seven Nation Army",
-      title: "Seven Nation\nArmy",
       previewSpan: PreviewSpan(start: 48, end: 73),
       volume: 1.7,
     ),
@@ -148,7 +141,6 @@ class SongManager {
     ),
     Song(
       name: "Stairway to Heaven",
-      title: "Stairway to\nHeaven",
       previewSpan: PreviewSpan(start: 0, end: 25),
       volume: 3.5,
     ),
@@ -159,13 +151,11 @@ class SongManager {
     ),
     Song(
       name: "Sultans Of Swing",
-      title: "Sultans Of\nSwing",
       previewSpan: PreviewSpan(start: 143, end: 161),
       volume: 1,
     ),
     Song(
       name: "The Final Countdown",
-      title: "The Final\nCountdown",
       previewSpan: PreviewSpan(start: 117, end: 136),
       volume: 1,
     ),
@@ -176,7 +166,6 @@ class SongManager {
     ),
     Song(
       name: "Under the Bridge",
-      title: "Under the\nBridge",
       previewSpan: PreviewSpan(start: 0, end: 28),
       volume: 2,
     ),
