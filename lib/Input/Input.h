@@ -11,6 +11,21 @@ static int toInt(Input input) {
     return static_cast<int>(input);
 }
 
+static String toString(Input input) {
+    switch (input) {
+        case Input::Input1:
+            return "Input1";
+        case Input::Input2:
+            return "Input2";
+        case Input::Input3:
+            return "Input3";
+        case Input::Input4:
+            return "Input4";
+        default:
+            return "None";
+    }
+}
+
 enum class InputState {
     Active,
     Inactive,

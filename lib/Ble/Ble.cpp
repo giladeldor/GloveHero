@@ -49,6 +49,13 @@ void Ble::setInput(Input input) {
     touchCharacteristic->notify();
 }
 
+void Ble::clearColors() {
+    uint8_t color[3] = {0, 0, 0};
+    for (int i = 0; i < NUM_INPUTS; i++) {
+        ledCharacteristics[i]->setValue(color, 3);
+    }
+}
+
 Color Ble::getColor(Input input) {
     int index = toInt(input);
     if (index < 0) {

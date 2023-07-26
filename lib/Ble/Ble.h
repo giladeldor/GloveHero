@@ -43,6 +43,8 @@ public:
 
     void setInput(Input input);
 
+    void clearColors();
+
     Color getColor(Input input);
 };
 

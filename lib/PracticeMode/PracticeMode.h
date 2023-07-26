@@ -58,6 +58,8 @@ public:
     ScoreType reactToTouch(long timestamp) const;
 
     const Color& getColor() const;
+
+    const TouchStage& getStage() const;
 };
 
 class PracticeMode {
