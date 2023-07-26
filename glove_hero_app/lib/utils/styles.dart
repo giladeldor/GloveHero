@@ -43,3 +43,25 @@ const songSelectionDialogTitleStyle = TextStyle(
   fontSize: 50,
   color: Colors.red,
 );
+
+const highScoreTextStyle = TextStyle(
+  fontFamily: "HighScore",
+  fontSize: 15,
+  color: Colors.white,
+);
+
+const highScoreTitle = TextStyle(
+  fontFamily: "HighScore",
+  fontSize: 17,
+  color: Colors.white,
+  fontWeight: FontWeight.w600,
+  decoration: TextDecoration.underline,
+  decorationThickness: 2.5,
+);
+
+const leaderBoardTitle = TextStyle(
+  fontFamily: "Karmatic",
+  fontSize: 45,
+  fontWeight: FontWeight.bold,
+  color: Color.fromARGB(255, 0, 0, 0), // eran is not satisfied
+);
