@@ -1,93 +1,93 @@
 #include "PracticeMode.h"
 
 constexpr long defaultTimePerRound = 350 * 3;
-constexpr long offset = 150;
 constexpr long timePerRoundDiff = 25;
 constexpr int maxActive = 3;
-constexpr int numStartCallbacks = 5;
-constexpr int numEndCallbacks = 7;
-constexpr int minTimePerRound = 150;
+constexpr int numEndGameFlashes = 3;
+constexpr int minTimePerRound = 300;
 
-std::function<void(long timestamp)> PracticeMode::startGameCallback(
-    int iteration) {
-    static std::array<Color, 3> colors = {
-        Color(255, 0, 0),
-        Color(255, 220, 0),
-        Color(0, 255, 0),
-    };
+std::array<Color, TouchStage::numStages> TouchStage::colors = {
+    Color(255, 40, 0),
+    Color(0, 130, 130),
+    Color(0, 255, 0),
+    Color(0, 0, 0),
+};
 
-    if (iteration == 4) {
-        return [=](long timestamp) { changeToGame(timestamp); };
-    }
+Color PracticeMode::missColor = {255, 0, 0};
 
-    if (iteration == 3) {
-        return [=](long) { ledManager->clear(); };
-    }
-
-    return [=](long) {
-        for (int j = 0; j < NUM_INPUTS; j++) {
-            ledManager->set(static_cast<Input>(j), colors[iteration]);
-        }
-    };
+constexpr int TouchStage::getNumStages() {
+    return numStages;
 }
 
-std::function<void(long timestamp)> PracticeMode::endGameCallback(
-    int iteration) {
-    static const Color color(255, 0, 0);
+bool TouchStage::next() {
+    stage = max<int>(stage + 1, numStages - 1);
+    return !missed();
+}
 
-    if (iteration == numEndCallbacks - 1) {
-        return [=](long timestamp) { startGame(); };
-    }
+int TouchStage::getStage() const {
+    return stage;
+}
 
-    if (iteration % 2 == 0) {
-        return [=](long) { ledManager->fill(color.red, 0, 0); };
-    }
+bool TouchStage::readyToTouch() const {
+    return stage == numStages - 2;
+}
 
+bool TouchStage::missed() const {
+    return stage == numStages - 1;
+}
+
+const Color& TouchStage::getColor() const {
+    return getColor(stage);
+}
+
+const Color& TouchStage::getColor(int stage) {
+    return colors[stage];
+}
+
+PracticeMode::Callback PracticeMode::clearCallback() {
     return [=](long) { ledManager->clear(); };
 }
 
-std::function<void(long timestamp)> PracticeMode::showLightCallback(
-    Input input,
-    Color color) {
-    return [=](long) { ledManager->set(input, color); };
-}
-
-std::function<void(long timestamp)> PracticeMode::clearLightsCallback(
-    Input input) {
-    return [=](long) { ledManager->clear(input); };
-}
-
-std::function<void(long timestamp)> PracticeMode::setLightCallback(Input input,
-                                                                   int pos) {
-    return [=](long) { ledManager->set(input, {255, 255, 255}); };
-}
-
-std::function<void(long timestamp)> PracticeMode::clearLightCallback(
-    Input input,
-    int pos) {
-    return [=](long) { ledManager->clear(input); };
+PracticeMode::Callback PracticeMode::fillColorCallback(Color color) {
+    return [=](long) { ledManager->fill(color); };
 }
 
 void PracticeMode::changeToStart(long timestamp) {
     state = State::Start;
 
-    for (int i = 0; i < numStartCallbacks; i++) {
-        scheduler.registerCallback(startGameCallback(i), timestamp + i * 750);
+    int itr = 0;
+    for (; itr < TouchStage::getNumStages(); itr++) {
+        scheduler.registerCallback(fillColorCallback(TouchStage::getColor(itr)),
+                                   timestamp + itr * 750);
     }
+    scheduler.registerCallback([=](long timestamp) { changeToGame(timestamp); },
+                               timestamp + itr * 750);
 }
 
 void PracticeMode::changeToGame(long timestamp) {
     state = State::Game;
     lastUpdate = timestamp;
+
+    // Initialize touches.
+    for (size_t i = 0; i < touches.size(); i++) {
+        touches[i] = Touch();
+    }
+    lastInput = Input::None;
 }
 
 void PracticeMode::changeToEnd(long timestamp) {
     state = State::End;
     scheduler.clear();
 
-    for (int i = 0; i < numEndCallbacks; i++) {
-        scheduler.registerCallback(endGameCallback(i), timestamp + i * 500);
+    int itr = 0;
+    for (; itr < numEndGameFlashes; itr++) {
+        scheduler.registerCallback(fillColorCallback(missColor),
+                                   timestamp + 2 * itr * 500);
+        scheduler.registerCallback(clearCallback(),
+                                   timestamp + (2 * itr + 1) * 500);
     }
+    scheduler.registerCallback([=](long timestamp) { startGame(); },
+                               timestamp + 2 * itr * 500);
 }
 
 int PracticeMode::numActive() const {
@@ -105,7 +105,8 @@ bool PracticeMode::shouldAddTouch() const {
 }
 
 int PracticeMode::getInactiveTouchIdx() const {
-    int counter = rand() % (NUM_INPUTS - numActive());
+    int numInactive = NUM_INPUTS - numActive();
+    int counter = rand() % numInactive;
 
     for (size_t i = 0; i < NUM_INPUTS; i++) {
         auto&& touch = touches[i];
@@ -128,11 +129,6 @@ void PracticeMode::startGame() {
     ledManager->clear();
     scheduler.clear();
 
-    // Initialize touches.
-    for (size_t i = 0; i < touches.size(); i++) {
-        touches[i] = Touch();
-    }
-
     changeToStart(timestamp);
 }
 
@@ -144,30 +140,35 @@ void PracticeMode::execute() {
         Input input = glove->update();
         if (input != lastInput) {
             lastInput = input;
-            touch(input, timestamp);
+            Serial.println("Input: " + String(static_cast<int>(input)));
+
+            if (input != Input::None) {
+                touch(input, timestamp);
+            }
         }
 
         // New round.
         if (timestamp - lastUpdate >= timePerRound) {
             lastUpdate = timestamp;
-            for (size_t i = 0; i < NUM_INPUTS; i++) {
-                auto&& touch = touches[i];
+            for (auto&& touch : touches) {
                 if (touch.getValid() && !touch.next(timestamp)) {
                     changeToEnd(timestamp);
+                    Serial.println("Missed (no touch)");
                 }
             }
 
             if (shouldAddTouch()) {
                 auto idx = getInactiveTouchIdx();
-                touches[idx].setValid(true, timestamp);
-                for (int i = 0; i < 3; i++) {
-                    scheduler.registerCallback(
-                        setLightCallback(static_cast<Input>(idx), i),
-                        timestamp + timePerRound * i);
-                    scheduler.registerCallback(
-                        clearLightCallback(static_cast<Input>(idx), i),
-                        timestamp + timePerRound * (i + 1));
-                }
+                touches[idx].setValid(true);
+            }
+        }
+
+        for (size_t i = 0; i < NUM_INPUTS; i++) {
+            auto&& touch = touches[i];
+            if (touch.getValid()) {
+                ledManager->set(static_cast<Input>(i), touch.getColor());
+            } else {
+                ledManager->clear(static_cast<Input>(i));
             }
         }
     }
@@ -175,83 +176,58 @@ void PracticeMode::execute() {
     ledManager->show();
 }
 
-void PracticeMode::handleTouch(Input input, ScoreType score, long timestamp) {
-    Color color = {255, 220, 0};
-    if (score == ScoreType::Good) {
-        color = {0, 255, 0};
-        timePerRound =
-            max<int>(minTimePerRound, timePerRound - timePerRoundDiff);
-    }
-
-    scheduler.registerCallback(showLightCallback(input, color), timestamp);
-    scheduler.registerCallback(clearLightsCallback(input), timestamp + 100);
+void PracticeMode::handleTouch(Input input, long timestamp) {
+    timePerRound = max<int>(minTimePerRound, timePerRound - timePerRoundDiff);
 }
 
 void PracticeMode::touch(Input input, long timestamp) {
-    Touch touch = touches[toInt(input)];
+    Touch& touch = touches[toInt(input)];
     if (!touch.getValid()) {
+        Serial.println("Missed (touch not valid)");
         changeToEnd(timestamp);
         return;
     }
 
-    ScoreType score = touch.reactToTouch(input, timestamp);
+    ScoreType score = touch.reactToTouch(timestamp);
+    Serial.println(String("Score: ") + toString(score));
     switch (score) {
         case ScoreType::Miss:
             changeToEnd(timestamp);
             break;
 
-        case ScoreType::Bad:
-            handleTouch(input, ScoreType::Bad, timestamp);
-            break;
-
-        case ScoreType::Good:
-            handleTouch(input, ScoreType::Good, timestamp);
+        case ScoreType::Hit:
+            handleTouch(input, timestamp);
             break;
 
         default:
             break;
     }
 
-    touch.setValid(false, timestamp);
+    touch.setValid(false);
 }
 
-Touch::Touch() : position(Position::Start), valid(false) {}
+Touch::Touch() : valid(false) {}
 
 bool Touch::next(long timestamp) {
-    if (!valid || position == Position::End)
-        return false;
-
-    lastUpdate = timestamp;
-    position = static_cast<Position>(static_cast<int>(position) + 1);
-    return true;
+    return valid && stage.next();
 }
 
-ScoreType Touch::reactToTouch(Input input, long timestamp) {
-    if (position != Position::End)
-        return ScoreType::Miss;
-
-    int diff = abs(lastUpdate - timestamp);
-    if (diff <= offset / 2)
-        return ScoreType::Good;
-    if (diff <= offset)
-        return ScoreType::Bad;
-
-    return ScoreType::Miss;
+ScoreType Touch::reactToTouch(long timestamp) const {
+    return stage.readyToTouch() ? ScoreType::Hit : ScoreType::Miss;
 }
 
-void Touch::setValid(bool valid, long timestamp) {
+const Color& Touch::getColor() const {
+    return stage.getColor();
+}
+
+void Touch::setValid(bool valid) {
     this->valid = valid;
 
     if (valid) {
-        lastUpdate = timestamp;
-        position = Position::Start;
+        stage = TouchStage();
     }
 }
 
 bool Touch::getValid() const {
     return valid;
-}
-
-Touch::Position Touch::getPosition() const {
-    return position;
 }

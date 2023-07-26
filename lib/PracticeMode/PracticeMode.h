@@ -6,15 +6,44 @@
 #include <time.h>
 #include <array>
 
-enum class ScoreType { Good, Bad, Miss };
+enum class ScoreType { Hit, Miss };
+
+static inline String toString(ScoreType score) {
+    switch (score) {
+        case ScoreType::Hit:
+            return "Hit";
+        case ScoreType::Miss:
+            return "Miss";
+        default:
+            return "Unknown";
+    }
+}
+
+class TouchStage {
+private:
+    int stage = 0;
+    static constexpr int numStages = 4;
+    static std::array<Color, numStages> colors;
+
+public:
+    static constexpr int getNumStages();
+
+    bool next();
+
+    int getStage() const;
+
+    bool readyToTouch() const;
+
+    bool missed() const;
+
+    const Color& getColor() const;
+
+    static const Color& getColor(int stage);
+};
 
 class Touch {
-public:
-    enum class Position { Start, Middle, End };
-
 private:
-    long lastUpdate;
-    Position position;
+    TouchStage stage;
     bool valid;
 
 public:
@@ -22,22 +51,23 @@ public:
 
     bool getValid() const;
 
-    void setValid(bool valid, long timestamp);
+    void setValid(bool valid);
 
     bool next(long timestamp);
 
-    ScoreType reactToTouch(Input input, long timestamp);
+    ScoreType reactToTouch(long timestamp) const;
 
-    Position getPosition() const;
+    const Color& getColor() const;
 };
 
 class PracticeMode {
 private:
     enum class State { Start, End, Game };
+    static Color missColor;
 
 private:
     LedManager* ledManager;
-    std::array<Touch, 4> touches;
+    std::array<Touch, NUM_INPUTS> touches;
     InputBase* glove;
     Scheduler scheduler;
     long timePerRound;
@@ -45,19 +75,10 @@ private:
     State state;
     Input lastInput;
 
-    std::function<void(long timestamp)> startGameCallback(int iteration);
+    using Callback = std::function<void(long timestamp)>;
 
-    std::function<void(long timestamp)> endGameCallback(int iteration);
-
-    std::function<void(long timestamp)> showLightCallback(Input input,
-                                                          Color color);
-
-    std::function<void(long timestamp)> clearLightsCallback(Input input);
-
-    std::function<void(long timestamp)> setLightCallback(Input input, int pos);
-
-    std::function<void(long timestamp)> clearLightCallback(Input input,
-                                                           int pos);
+    Callback clearCallback();
+    Callback fillColorCallback(Color color);
 
     void changeToStart(long timestamp);
 
@@ -71,7 +92,9 @@ private:
 
     int getInactiveTouchIdx() const;
 
-    void handleTouch(Input input, ScoreType score, long timestamp);
+    void handleTouch(Input input, long timestamp);
+
+    void touch(Input input, long timestamp);
 
 public:
     void setup(LedManager* ledManager, InputBase* glove);
@@ -79,8 +102,6 @@ public:
     void startGame();
 
     void execute();
-
-    void touch(Input input, long timestamp);
 };
 
 #endif
