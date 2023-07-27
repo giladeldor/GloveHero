@@ -5,7 +5,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glove_hero_app/models/audio_manager.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/models/touch.dart';
+import 'package:glove_hero_app/utils/functions.dart';
 import 'package:glove_hero_app/utils/painter.dart';
+import 'package:glove_hero_app/widgets/glove_controls.dart';
 import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -16,36 +18,22 @@ import '../widgets/countdown.dart';
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
   final Song song;
+
   @override
   State<RecordingModePage> createState() => _RecordingModePageState();
 }
 
-class _RecordingModePageState extends State<RecordingModePage>
-    with WidgetsBindingObserver {
-  late Song _song;
-  late BleInput _input;
+class _RecordingModePageState extends State<RecordingModePage> {
   final SongTouches _songTouches = SongTouches();
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   var _isVisible = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _song = widget.song;
-
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _input = context.read<BleInput>();
-      _input.addPressListener(_handleInput);
-    });
-  }
 
   void endSong() {
     _onSongEndSubscription?.cancel();
     showDialog(
       context: context,
       builder: (BuildContext context) => _Dialog(
-        song: _song,
+        song: widget.song,
         songTouches: _songTouches,
       ),
     ).then((value) => Navigator.of(context)
@@ -53,12 +41,10 @@ class _RecordingModePageState extends State<RecordingModePage>
       ..maybePop());
   }
 
-  void _handleInput(Input input) {
-    print("handleInput");
+  void _onPress(Input input) {
     if (context.mounted && !(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
-    // TODO: activate LEDs
     if (input == Input.none) {
       final touch = _TouchClassifier.release(AudioManager.position);
       if (touch == null) return;
@@ -71,14 +57,10 @@ class _RecordingModePageState extends State<RecordingModePage>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        _onSongEndSubscription?.cancel();
-        _input.removePressListener((_handleInput));
-        AudioManager.stop();
-
-        return Future.value(true);
-      },
+    return GloveControls(
+      onPress: _onPress,
+      onLifecycleChange: audioOnLifecycleChange,
+      onPop: () => _onSongEndSubscription?.cancel(),
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -105,7 +87,9 @@ class _RecordingModePageState extends State<RecordingModePage>
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SongCard(
-                          songName: _song.title, songArtPath: _song.artAsset),
+                        songName: widget.song.title,
+                        songArtPath: widget.song.artAsset,
+                      ),
                     ),
                   ),
                   _isVisible
@@ -116,16 +100,14 @@ class _RecordingModePageState extends State<RecordingModePage>
                               setState(() {
                                 _isVisible = false;
                               });
-                              AudioManager.playSong(_song);
+                              AudioManager.playSong(widget.song);
                               _onSongEndSubscription = AudioManager.onSongEnd(
                                 endSong,
                               );
                             },
                           ),
                         )
-                      : const Spacer(
-                          flex: 1,
-                        ),
+                      : const Spacer(flex: 1),
                   const Spacer(flex: 1)
                 ],
               ),
@@ -134,28 +116,6 @@ class _RecordingModePageState extends State<RecordingModePage>
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    _input.removeTouchListener(_handleInput);
-    WidgetsBinding.instance.removeObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.paused:
-        AudioManager.pause();
-        break;
-      case AppLifecycleState.resumed:
-        AudioManager.play();
-        break;
-      default:
-        break;
-    }
   }
 }
 

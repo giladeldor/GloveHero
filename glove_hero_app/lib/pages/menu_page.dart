@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
+import 'package:glove_hero_app/widgets/glove_controls.dart';
 import 'package:provider/provider.dart';
 import 'controls_page.dart';
 import '../models/controller_action.dart';
@@ -24,7 +25,7 @@ class _MenuPageState extends State<MenuPage> {
   late BleInput _input;
   _MenuButtonID? _selectedButton;
 
-  void _handleInput(Input input) {
+  void _onTouch(Input input) {
     if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
@@ -106,12 +107,13 @@ class _MenuPageState extends State<MenuPage> {
               (file) {
                 try {
                   SongTouches.fromJson(jsonDecode(file.readAsStringSync()));
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SinglePlayerModePage(song: song),
-                    ),
-                  );
+                  Navigator.maybePop(context).then((_) => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SinglePlayerModePage(song: song),
+                        ),
+                      ));
                 } catch (e) {
                   print("exception: $e");
                   showDialog(
@@ -130,144 +132,132 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _input = context.read<BleInput>();
-      _input.addTouchListener(_handleInput);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     const buttonPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 0);
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/backgrounds/menu-background.jpeg"),
-            fit: BoxFit.cover,
+    return GloveControls(
+      onTouch: _onTouch,
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/backgrounds/menu-background.jpeg"),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: Consumer<BleConnection>(
-          builder: (context, connection, child) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 40.0, bottom: 16.0),
-                  child: Text(
-                    "Glove Hero",
-                    style: titleTextStyle,
-                    textAlign: TextAlign.center,
+          child: Consumer<BleConnection>(
+            builder: (context, connection, child) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 40.0, bottom: 16.0),
+                    child: Text(
+                      "Glove Hero",
+                      style: titleTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: buttonPadding,
-                  child: _MenuButton(
-                    id: _MenuButtonID.singlePlayer,
-                    onPressed: connection.state == BleConnectionState.connected
-                        ? () {
-                            setState(() {
-                              _selectedButton = null;
-                            });
-                            _handleSelect(_MenuButtonID.singlePlayer);
-                          }
-                        : null,
-                    selected: _selectedButton,
+                  Padding(
+                    padding: buttonPadding,
+                    child: _MenuButton(
+                      id: _MenuButtonID.singlePlayer,
+                      onPressed:
+                          connection.state == BleConnectionState.connected
+                              ? () {
+                                  setState(() {
+                                    _selectedButton = null;
+                                  });
+                                  _handleSelect(_MenuButtonID.singlePlayer);
+                                }
+                              : null,
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _MenuButton(
-                    id: _MenuButtonID.multiplayer,
-                    onPressed: connection.state == BleConnectionState.connected
-                        ? () {
-                            setState(() {
-                              _selectedButton = null;
-                            });
-                            _handleSelect(_MenuButtonID.multiplayer);
-                          }
-                        : null,
-                    selected: _selectedButton,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _MenuButton(
+                      id: _MenuButtonID.multiplayer,
+                      onPressed:
+                          null /*connection.state == BleConnectionState.connected
+                          ? () {
+                              setState(() {
+                                _selectedButton = null;
+                              });
+                              _handleSelect(_MenuButtonID.multiplayer);
+                            }
+                          : null*/
+                      ,
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _MenuButton(
-                    id: _MenuButtonID.recordingMode,
-                    onPressed: connection.state == BleConnectionState.connected
-                        ? () {
-                            setState(() {
-                              _selectedButton = null;
-                            });
-                            _handleSelect(_MenuButtonID.recordingMode);
-                          }
-                        : null,
-                    selected: _selectedButton,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _MenuButton(
+                      id: _MenuButtonID.recordingMode,
+                      onPressed:
+                          connection.state == BleConnectionState.connected
+                              ? () {
+                                  setState(() {
+                                    _selectedButton = null;
+                                  });
+                                  _handleSelect(_MenuButtonID.recordingMode);
+                                }
+                              : null,
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _MenuButton(
-                    id: _MenuButtonID.leaderboard,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.leaderboard);
-                    },
-                    selected: _selectedButton,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _MenuButton(
+                      id: _MenuButtonID.leaderboard,
+                      onPressed: () {
+                        setState(() {
+                          _selectedButton = null;
+                        });
+                        _handleSelect(_MenuButtonID.leaderboard);
+                      },
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _MenuButton(
-                    id: _MenuButtonID.statistics,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.statistics);
-                    },
-                    selected: _selectedButton,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _MenuButton(
+                      id: _MenuButtonID.statistics,
+                      onPressed: () {
+                        setState(() {
+                          _selectedButton = null;
+                        });
+                        _handleSelect(_MenuButtonID.statistics);
+                      },
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _MenuButton(
-                    id: _MenuButtonID.controls,
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = null;
-                      });
-                      _handleSelect(_MenuButtonID.controls);
-                    },
-                    selected: _selectedButton,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _MenuButton(
+                      id: _MenuButtonID.controls,
+                      onPressed: () {
+                        setState(() {
+                          _selectedButton = null;
+                        });
+                        _handleSelect(_MenuButtonID.controls);
+                      },
+                      selected: _selectedButton,
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    _input.removeTouchListener(_handleInput);
   }
 }
 
 class _MenuButton extends StatelessWidget {
   const _MenuButton({
-    // ignore: unused_element
-    super.key,
     required this.id,
     this.onPressed,
     this.selected,
@@ -380,7 +370,6 @@ class _RedirectToRecordDialog extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

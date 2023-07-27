@@ -1,7 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:glove_hero_app/models/song.dart';
-import 'package:provider/provider.dart';
+import '../models/song.dart';
+import '../utils/functions.dart';
+import '../widgets/glove_controls.dart';
 import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/controller_action.dart';
@@ -15,69 +16,35 @@ class SongSelectionMenuPage extends StatefulWidget {
   State<SongSelectionMenuPage> createState() => _SongSelectionMenuPageState();
 }
 
-class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
-    with WidgetsBindingObserver {
-  late BleInput _input;
+class _SongSelectionMenuPageState extends State<SongSelectionMenuPage> {
   final CarouselController _carouselController = CarouselController();
   int songIndex = 0;
-  late final Function(Song song)? _onSelect;
 
   void onPress() {
     AudioManager.stop();
-    _onSelect?.call(SongManager.songs[songIndex]);
+    widget.onSelect?.call(SongManager.songs[songIndex]);
   }
 
   @override
   void initState() {
     super.initState();
-    _onSelect = widget.onSelect;
-
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _input = context.read<BleInput>();
-      _input.addTouchListener(_handleInput);
-    });
 
     AudioManager.playClip(SongManager.songs[songIndex]);
   }
 
-  void _handleInput(Input input) {
-    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
-      return;
-    }
-
-    final menuAction = MenuAction.fromInput(input);
-    switch (menuAction) {
-      case MenuAction.up:
-        _carouselController.nextPage();
-        break;
-      case MenuAction.down:
-        _carouselController.previousPage();
-        break;
-      case MenuAction.select:
-        onPress();
-        break;
-      case MenuAction.back:
-        Navigator.of(context).pop();
-        break;
-      default:
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        AudioManager.stop();
-        return Future.value(true);
-      },
+    return GloveControls(
+      onTouch: _onTouch,
+      onPop: () => AudioManager.stop(),
+      onLifecycleChange: audioOnLifecycleChange,
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  "assets/backgrounds/recording-page-background.jpeg"),
+                "assets/backgrounds/recording-page-background.jpeg",
+              ),
               fit: BoxFit.cover,
             ),
           ),
@@ -97,7 +64,7 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
                 reverse: false,
                 enlargeCenterPage: true,
                 scrollDirection: Axis.horizontal,
-                onPageChanged: onPageChange,
+                onPageChanged: _onPageChange,
               ),
             ),
           ),
@@ -106,29 +73,31 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage>
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _onTouch(Input input) {
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
+      return;
+    }
 
-    WidgetsBinding.instance.removeObserver(this);
-    _input.removeTouchListener(_handleInput);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.paused:
-        AudioManager.pause();
+    final menuAction = MenuAction.fromInput(input);
+    switch (menuAction) {
+      case MenuAction.up:
+        _carouselController.nextPage();
         break;
-      case AppLifecycleState.resumed:
-        AudioManager.play();
+      case MenuAction.down:
+        _carouselController.previousPage();
+        break;
+      case MenuAction.select:
+        onPress();
+        break;
+      case MenuAction.back:
+        Navigator.of(context).maybePop();
         break;
       default:
         break;
     }
   }
 
-  onPageChange(int index, CarouselPageChangedReason reason) {
+  _onPageChange(int index, CarouselPageChangedReason reason) {
     songIndex = index;
     AudioManager.playClip(SongManager.songs[songIndex]);
   }

@@ -6,13 +6,14 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:glove_hero_app/models/touch.dart';
-import 'package:glove_hero_app/utils/painter.dart';
-import 'package:glove_hero_app/utils/styles.dart';
-import 'package:glove_hero_app/widgets/countdown.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
+import '../models/touch.dart';
+import '../utils/painter.dart';
+import '../utils/styles.dart';
+import '../widgets/countdown.dart';
+import '../widgets/glove_controls.dart';
 import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/song.dart';
@@ -27,7 +28,7 @@ class SinglePlayerModePage extends StatefulWidget {
 }
 
 class _SinglePlayerModePageState extends State<SinglePlayerModePage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   int _score = 0;
 
   bool _isVisible = true;
@@ -35,7 +36,6 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   SongTouches? _songTouches;
   late List<Touch>? _touches;
   late StreamSubscription<PlayerState>? _onSongEndSubscription;
-  late BleInput _input;
   late BleModel _bleModel;
   var _events = <_TouchEvent>[];
   Touch? _longTouch;
@@ -46,6 +46,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
 
   void endSong() {
     _onSongEndSubscription?.cancel();
+    // TODO: add dialog
     Navigator.of(context).maybePop();
   }
 
@@ -85,18 +86,15 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _bleModel = context.read<BleModel>();
-      _input = context.read<BleInput>();
-      _input.addPressListener(_handleInput);
-    });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _bleModel = context.read<BleModel>());
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return GloveControls(
+      onPress: _onPress,
+      onPop: _onPop,
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -147,24 +145,18 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     );
   }
 
-  Future<bool> _onWillPop() async {
-    AudioManager.stop();
-    _onSongEndSubscription?.cancel();
-    _input.removePressListener(_handleInput);
-
-    return true;
-  }
-
   @override
   void dispose() {
     _ticker.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    _input.removePressListener(_handleInput);
-
     super.dispose();
   }
 
-  void _handleInput(Input input) {
+  void _onPop() {
+    AudioManager.stop();
+    _onSongEndSubscription?.cancel();
+  }
+
+  void _onPress(Input input) {
     if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
