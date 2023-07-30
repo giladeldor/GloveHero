@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
+import 'package:glove_hero_app/pages/statistics_page.dart';
 import 'package:glove_hero_app/widgets/glove_controls.dart';
 import 'package:provider/provider.dart';
 import '../widgets/redirect_to_record_dialog.dart';
@@ -71,7 +72,11 @@ class _MenuPageState extends State<MenuPage> {
         );
         break;
       case _MenuButtonID.statistics:
-        // Navigator.pushNamed(context, "/statistics");
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const StatisticsPage(),
+          ),
+        );
         break;
       case _MenuButtonID.controls:
         Navigator.of(context).push(MaterialPageRoute(

@@ -7,10 +7,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:glove_hero_app/models/high_score.dart';
+import 'package:glove_hero_app/models/statistics.dart';
 import 'package:glove_hero_app/widgets/get_name_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
+import '../models/score.dart';
 import '../models/touch.dart';
 import '../utils/painter.dart';
 import '../utils/styles.dart';
@@ -43,7 +45,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   var _events = <_TouchEvent>[];
   Touch? _longTouch;
   int _lastUpdate = 0;
-  final HashMap<Touch, _ScoreType> _scores = HashMap();
+  final _statistics = SongStatistics();
   Future<void> _colorFuture = Future.value();
   late Ticker _ticker;
 
@@ -58,6 +60,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     final highScores = await SongManager.getHighScores(_song);
     highScores.addScore(HighScore(name: name, score: _score));
     await SongManager.saveHighScores(_song, highScores);
+    await StatisticsManager.addStatistics(_song, _statistics);
 
     if (context.mounted) {
       await Navigator.of(context).maybePop().then(
@@ -120,7 +123,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
           decoration: const BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
-              image: AssetImage("assets/hills-background.jpg"),
+              image: AssetImage("assets/backgrounds/hills-background.jpg"),
               fit: BoxFit.cover,
             ),
           ),
@@ -209,19 +212,19 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
 
       final (index, touch) = nextTouch;
       final diff = (touch.timeStamp - event.timestamp).abs();
-      final scoreType = _ScoreType.fromDiff(diff, touchOffset);
+      final scoreType = ScoreType.fromDiff(diff, touchOffset);
 
-      if (scoreType != _ScoreType.miss && touch.type == TouchType.long) {
+      if (scoreType != ScoreType.miss && touch.type == TouchType.long) {
         _longTouch = touch;
         _lastUpdate = timeStamp;
       }
 
-      _scores[touch] = scoreType;
+      _statistics.addScore(touch.input, scoreType);
       _score += scoreType.score;
 
       _setColor(touch, scoreType);
 
-      if (scoreType != _ScoreType.miss) {
+      if (scoreType != ScoreType.miss) {
         _touches!.removeRange(0, index + 1);
       }
     }
@@ -243,13 +246,13 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     while (_touches!.isNotEmpty &&
         _touches!.first.timeStamp < timeStamp - touchOffset) {
       final touch = _touches!.removeAt(0);
-      _scores[touch] = _ScoreType.miss;
+      _statistics.addScore(touch.input, ScoreType.miss);
 
-      _setColor(touch, _ScoreType.miss);
+      _setColor(touch, ScoreType.miss);
     }
   }
 
-  void _setColor(Touch touch, _ScoreType scoreType) {
+  void _setColor(Touch touch, ScoreType scoreType) {
     _colorFuture = _colorFuture
         .then(
       (_) => _bleModel.setColor(
@@ -375,32 +378,4 @@ class _TouchEvent {
     required this.input,
     required this.timestamp,
   });
-}
-
-enum _ScoreType {
-  good,
-  bad,
-  miss;
-
-  factory _ScoreType.fromDiff(int diff, int offset) {
-    if (diff <= offset / 2) {
-      return _ScoreType.good;
-    } else if (diff <= offset) {
-      return _ScoreType.bad;
-    } else {
-      return _ScoreType.miss;
-    }
-  }
-
-  int get score => switch (this) {
-        _ScoreType.good => goodScore,
-        _ScoreType.bad => badScore,
-        _ScoreType.miss => missScore,
-      };
-
-  Color get color => switch (this) {
-        _ScoreType.good => const Color.fromARGB(255, 0, 255, 0),
-        _ScoreType.bad => const Color.fromARGB(255, 0, 0, 255),
-        _ScoreType.miss => const Color.fromARGB(255, 255, 0, 0),
-      };
 }

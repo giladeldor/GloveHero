@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glove_hero_app/models/high_score.dart';
+import 'package:glove_hero_app/models/score.dart';
+import 'package:glove_hero_app/pages/song_selection_menu_page.dart';
 import 'package:glove_hero_app/pages/statistics_page.dart';
 import 'package:provider/provider.dart';
 import 'models/ble.dart';
 import 'models/song.dart';
+import 'models/statistics.dart';
 import 'pages/menu_page.dart';
 import 'pages/single_player_mode_page.dart';
 
@@ -39,12 +42,13 @@ class GloveHeroApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SafeArea(
-        child: StatisticsPage(),
-        // child: MenuPage(),
-        //child: RecordingModePage(song: SongManager.songs[5]),
+      home: SafeArea(
+        // child: StatisticsPage(),
+        child: MenuPage(),
+        // child: RecordingModePage(song: SongManager.songs[5]),
         //child: SinglePlayerModePage(
         //  song: SongManager.songs[22],
+        // child: SongSelectionMenuPage(onSelect: (_) {}),
         //),
       ),
       debugShowCheckedModeBanner: false,

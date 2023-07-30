@@ -45,6 +45,13 @@ enum Input {
         Input.input3 => 2,
         Input.input4 => 3
       };
+
+  static const List<Input> realValues = [
+    Input.input1,
+    Input.input2,
+    Input.input3,
+    Input.input4
+  ];
 }
 
 class BleModel {

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/audio_manager.dart';
 
 audioOnLifecycleChange(state) {
@@ -13,4 +14,9 @@ audioOnLifecycleChange(state) {
     default:
       break;
   }
+}
+
+Future<String> get localDir async {
+  final directory = await getApplicationDocumentsDirectory();
+  return directory.path;
 }

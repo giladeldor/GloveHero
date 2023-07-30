@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 
+import '../utils/functions.dart';
 import 'high_score.dart';
 
 class Song {
@@ -22,7 +22,7 @@ class Song {
   String get audioAsset => "assets/audio/$_assetTitle.mp3";
   String get artAsset => "assets/song-art/$_assetTitle.jpg";
   Future<File> get touchFile async {
-    final file = File("${await _localDir}/touches/$_assetTitle.json");
+    final file = File("${await localDir}/touches/$_assetTitle.json");
     if (await file.exists() && await file.length() > 0) return file;
 
     await file.create(recursive: true);
@@ -35,13 +35,8 @@ class Song {
   }
 
   Future<File> get highScoreFile async {
-    final file = File("${await _localDir}/high-scores/$_assetTitle.json");
+    final file = File("${await localDir}/high-scores/$_assetTitle.json");
     return await file.create(recursive: true);
-  }
-
-  Future<String> get _localDir async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
   }
 
   String get _assetTitle =>
@@ -190,6 +185,9 @@ class SongManager {
       volume: 0.7,
     ),
   ];
+
+  static Song getSongByName(String name) =>
+      songs.firstWhere((element) => element.name == name);
 
   static Future<SongHighScores> getHighScores(Song song) async {
     final file = await song.highScoreFile;
