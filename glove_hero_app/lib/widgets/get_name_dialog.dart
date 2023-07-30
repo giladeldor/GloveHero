@@ -28,7 +28,7 @@ class _GetNameDialogState extends State<GetNameDialog> {
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         backgroundColor:
-            const Color.fromARGB(255, 186, 203, 236).withAlpha(100),
+            const Color.fromARGB(255, 186, 203, 236).withAlpha(170),
         title: const Text(
           "Enter Your Name",
           textAlign: TextAlign.center,

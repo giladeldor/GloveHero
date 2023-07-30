@@ -86,10 +86,7 @@ class _RecordingModePageState extends State<RecordingModePage> {
                     flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: SongCard(
-                        songName: widget.song.title,
-                        songArtPath: widget.song.artAsset,
-                      ),
+                      child: SongCard(song: widget.song),
                     ),
                   ),
                   _isVisible

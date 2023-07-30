@@ -127,11 +127,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Color _getPercentColor(int percent) {
-    if (percent < 50) {
+    if (percent < 40) {
       return Colors.red;
-    } else if (percent < 75) {
+    } else if (percent < 60) {
       return const Color.fromARGB(255, 254, 183, 78);
-    } else if (percent < 90) {
+    } else if (percent < 80) {
       return Colors.yellow;
     } else {
       return const Color.fromARGB(255, 100, 221, 113);

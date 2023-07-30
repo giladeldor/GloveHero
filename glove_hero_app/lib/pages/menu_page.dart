@@ -91,12 +91,12 @@ class _MenuPageState extends State<MenuPage> {
       MaterialPageRoute(
         builder: (context) => SongSelectionMenuPage(
           onSelect: (song) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RecordingModePage(song: song),
-              ),
-            );
+            Navigator.maybePop(context).then((_) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RecordingModePage(song: song),
+                  ),
+                ));
           },
         ),
       ),
