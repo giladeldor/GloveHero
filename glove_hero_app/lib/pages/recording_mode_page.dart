@@ -60,7 +60,7 @@ class _RecordingModePageState extends State<RecordingModePage> {
     return GloveControls(
       onPress: _onPress,
       onLifecycleChange: audioOnLifecycleChange,
-      onPop: () => _onSongEndSubscription?.cancel(),
+      onPop: _onPop,
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -116,6 +116,11 @@ class _RecordingModePageState extends State<RecordingModePage> {
         ),
       ),
     );
+  }
+
+  _onPop() {
+    AudioManager.stop();
+    _onSongEndSubscription?.cancel();
   }
 }
 
