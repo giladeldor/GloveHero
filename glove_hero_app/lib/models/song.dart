@@ -35,8 +35,8 @@ class Song {
   }
 
   Future<File> get highScoreFile async {
-    return File("${await _localDir}/high-scores/$_assetTitle.json")
-        .create(recursive: true);
+    final file = File("${await _localDir}/high-scores/$_assetTitle.json");
+    return await file.create(recursive: true);
   }
 
   Future<String> get _localDir async {
@@ -195,21 +195,6 @@ class SongManager {
     final file = await song.highScoreFile;
     late SongHighScores highScores;
 
-    if (song == songs[4]) {
-      highScores = SongHighScores();
-      highScores.addScore(HighScore(name: "NAD", score: 100));
-      highScores.addScore(HighScore(name: "EC", score: 100));
-      highScores.addScore(HighScore(name: "GLD", score: 50));
-      highScores.addScore(HighScore(name: "NAD", score: 150));
-      highScores.addScore(HighScore(name: "EC", score: 175));
-      highScores.addScore(HighScore(name: "GLD", score: 200));
-      highScores.addScore(HighScore(name: "NAD", score: 221));
-      highScores.addScore(HighScore(name: "EC", score: 300));
-      highScores.addScore(HighScore(name: "GLD", score: 1));
-      highScores.addScore(HighScore(name: "FCK", score: 75));
-      return highScores;
-    }
-
     try {
       highScores =
           SongHighScores.fromJson(jsonDecode(await file.readAsString()));
@@ -218,5 +203,13 @@ class SongManager {
       await file.writeAsString(jsonEncode(highScores));
     }
     return highScores;
+  }
+
+  static Future<void> saveHighScores(
+    Song song,
+    SongHighScores highScores,
+  ) async {
+    final file = await song.highScoreFile;
+    await file.writeAsString(jsonEncode(highScores), flush: true);
   }
 }

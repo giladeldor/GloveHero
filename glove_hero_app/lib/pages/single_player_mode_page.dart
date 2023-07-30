@@ -6,6 +6,8 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:glove_hero_app/models/high_score.dart';
+import 'package:glove_hero_app/widgets/get_name_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +20,7 @@ import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/song.dart';
 import '../utils/constants.dart';
+import 'leaderboard_page.dart';
 
 class SinglePlayerModePage extends StatefulWidget {
   const SinglePlayerModePage({super.key, required this.song});
@@ -44,10 +47,27 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   Future<void> _colorFuture = Future.value();
   late Ticker _ticker;
 
-  void endSong() {
+  Future<void> endSong() async {
     _onSongEndSubscription?.cancel();
-    // TODO: add dialog
-    Navigator.of(context).maybePop();
+
+    final name = await showDialog(
+      context: context,
+      builder: (BuildContext context) => const GetNameDialog(),
+    );
+
+    final highScores = await SongManager.getHighScores(_song);
+    highScores.addScore(HighScore(name: name, score: _score));
+    await SongManager.saveHighScores(_song, highScores);
+
+    if (context.mounted) {
+      await Navigator.of(context).maybePop().then(
+            (_) => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LeaderboardPage(initialSong: _song),
+              ),
+            ),
+          );
+    }
   }
 
   void startSong() {

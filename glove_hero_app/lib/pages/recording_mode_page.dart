@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:glove_hero_app/models/audio_manager.dart';
-import 'package:glove_hero_app/models/ble.dart';
-import 'package:glove_hero_app/models/touch.dart';
-import 'package:glove_hero_app/utils/functions.dart';
-import 'package:glove_hero_app/utils/painter.dart';
-import 'package:glove_hero_app/widgets/glove_controls.dart';
-import 'package:glove_hero_app/widgets/song_card.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+
 import '../models/song.dart';
-import '../utils/styles.dart';
+import '../models/audio_manager.dart';
+import '../models/ble.dart';
+import '../models/touch.dart';
 import '../widgets/countdown.dart';
+import '../widgets/save_recording_dialog.dart';
+import '../widgets/glove_controls.dart';
+import '../widgets/song_card.dart';
+import '../utils/functions.dart';
+import '../utils/painter.dart';
 
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
@@ -32,7 +32,7 @@ class _RecordingModePageState extends State<RecordingModePage> {
     _onSongEndSubscription?.cancel();
     showDialog(
       context: context,
-      builder: (BuildContext context) => _Dialog(
+      builder: (BuildContext context) => SaveRecordingDialog(
         song: widget.song,
         songTouches: _songTouches,
       ),
@@ -115,67 +115,6 @@ class _RecordingModePageState extends State<RecordingModePage> {
           ]),
         ),
       ),
-    );
-  }
-}
-
-class _Dialog extends StatelessWidget {
-  const _Dialog({
-    Key? key,
-    required this.song,
-    required this.songTouches,
-  }) : super(key: key);
-
-  final Song song;
-  final SongTouches songTouches;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      icon: const Icon(
-        Icons.check_circle,
-        color: Colors.green,
-        size: 40,
-      ),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      title: const Text(
-        "Saved Song Recording!",
-        textAlign: TextAlign.center,
-      ),
-      titleTextStyle: dialogTitleStyle,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Please Rate The Difficulty Of The Song:",
-            textAlign: TextAlign.center,
-            style: dialogTextStyle,
-          ),
-          RatingBar.builder(
-            itemCount: 3,
-            itemSize: 50,
-            itemBuilder: (context, _) => const Icon(
-              Icons.star,
-              color: Colors.amber,
-            ),
-            onRatingUpdate: (rating) {
-              songTouches.setDifficulty(rating.toInt());
-            },
-          ),
-          TextButton(
-            onPressed: () async {
-              final file = await song.touchFile;
-              await file.writeAsString(jsonEncode(songTouches), flush: true);
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
     );
   }
 }

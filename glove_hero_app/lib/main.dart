@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:glove_hero_app/models/high_score.dart';
 import 'package:provider/provider.dart';
 import 'models/ble.dart';
 import 'models/song.dart';

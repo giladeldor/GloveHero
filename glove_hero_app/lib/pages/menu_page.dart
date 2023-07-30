@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:glove_hero_app/models/ble.dart';
 import 'package:glove_hero_app/widgets/glove_controls.dart';
 import 'package:provider/provider.dart';
+import '../widgets/redirect_to_record_dialog.dart';
 import 'controls_page.dart';
 import '../models/controller_action.dart';
 import '../models/song.dart';
@@ -65,7 +66,7 @@ class _MenuPageState extends State<MenuPage> {
       case _MenuButtonID.leaderboard:
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const LeaderboardPage(),
+            builder: (context) => LeaderboardPage(),
           ),
         );
         break;
@@ -120,7 +121,7 @@ class _MenuPageState extends State<MenuPage> {
                     barrierDismissible: false,
                     context: context,
                     builder: (BuildContext context) =>
-                        _RedirectToRecordDialog(song: song),
+                        RedirectToRecordDialog(song: song),
                   );
                 }
               },
@@ -321,71 +322,5 @@ enum _MenuButtonID {
   _MenuButtonID get down {
     final idx = (index + 1) % _MenuButtonID.values.length;
     return _MenuButtonID.values[idx];
-  }
-}
-
-class _RedirectToRecordDialog extends StatelessWidget {
-  const _RedirectToRecordDialog({
-    Key? key,
-    required this.song,
-  }) : super(key: key);
-
-  final Song song;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      title: const Text(
-        "Song Recording Doesn't Exist",
-        textAlign: TextAlign.center,
-      ),
-      titleTextStyle: songSelectionDialogTitleStyle,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Would You Like To Record It?",
-            textAlign: TextAlign.center,
-            style: dialogTextStyle,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RecordingModePage(
-                        song: song,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text("Yes"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SinglePlayerModePage(
-                        song: song,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text("No"),
-              ),
-            ],
-          ),
-        ],
-      ),
-      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
-    );
   }
 }

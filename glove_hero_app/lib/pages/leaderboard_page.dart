@@ -11,7 +11,10 @@ import '../models/controller_action.dart';
 import '../widgets/song_card.dart';
 
 class LeaderboardPage extends StatefulWidget {
-  const LeaderboardPage({super.key});
+  LeaderboardPage({super.key, Song? initialSong})
+      : initialSong = initialSong ?? SongManager.songs[0];
+
+  final Song initialSong;
 
   @override
   State<LeaderboardPage> createState() => _LeaderboardPageState();
@@ -23,6 +26,15 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       SongManager.getHighScores(SongManager.songs[0]);
 
   final List<String> stringFromIndex = ["ST", "ND", "RD", "TH"];
+
+  @override
+  void initState() {
+    int index = SongManager.songs.indexOf(widget.initialSong);
+    _carouselController.onReady
+        .then((value) => _carouselController.jumpToPage(index));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
