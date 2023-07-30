@@ -1,20 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:glove_hero_app/models/ble.dart';
-import 'package:glove_hero_app/pages/statistics_page.dart';
-import 'package:glove_hero_app/widgets/glove_controls.dart';
 import 'package:provider/provider.dart';
-import '../widgets/redirect_to_record_dialog.dart';
+
+import 'statistics_page.dart';
 import 'controls_page.dart';
-import '../models/controller_action.dart';
-import '../models/song.dart';
-import '../models/touch.dart';
-import '../utils/styles.dart';
 import 'leaderboard_page.dart';
 import 'recording_mode_page.dart';
 import 'single_player_mode_page.dart';
 import 'song_selection_menu_page.dart';
+import '../models/ble.dart';
+import '../widgets/glove_controls.dart';
+import '../widgets/redirect_to_record_dialog.dart';
+import '../models/controller_action.dart';
+import '../models/touch.dart';
+import '../utils/styles.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -24,7 +24,6 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  late BleInput _input;
   _MenuButtonID? _selectedButton;
 
   void _onTouch(Input input) {
@@ -121,7 +120,6 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                       ));
                 } catch (e) {
-                  print("exception: $e");
                   showDialog(
                     barrierDismissible: false,
                     context: context,

@@ -62,7 +62,8 @@ class _GetNameDialogState extends State<GetNameDialog> {
               child: Text(
                 "Save",
                 style: highScoreTextStyle.copyWith(
-                    fontSize: 25, color: Color.fromARGB(255, 246, 144, 119)),
+                    fontSize: 25,
+                    color: const Color.fromARGB(255, 246, 144, 119)),
               ),
             ),
           ],
