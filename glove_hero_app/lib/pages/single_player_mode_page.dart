@@ -46,7 +46,6 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   Touch? _longTouch;
   int _lastUpdate = 0;
   final _statistics = SongStatistics();
-  Future<void> _colorFuture = Future.value();
   late Ticker _ticker;
 
   Future<void> endSong() async {
@@ -253,23 +252,15 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
   }
 
   void _setColor(Touch touch, ScoreType scoreType) {
-    _colorFuture = _colorFuture
-        .then(
-      (_) => _bleModel.setColor(
+    _bleModel.setColor(input: touch.input, color: scoreType.color);
+
+    final delay = touch.type == TouchType.long ? touch.duration! : 100;
+    Future.delayed(Duration(milliseconds: delay)).then((_) {
+      _bleModel.setColor(
         input: touch.input,
-        color: scoreType.color,
-      ),
-    )
-        .then(
-      (_) async {
-        final delay = touch.type == TouchType.long ? touch.duration! : 100;
-        await Future.delayed(Duration(milliseconds: delay));
-        _bleModel.setColor(
-          input: touch.input,
-          color: Colors.black,
-        );
-      },
-    );
+        color: Colors.black,
+      );
+    });
   }
 }
 
