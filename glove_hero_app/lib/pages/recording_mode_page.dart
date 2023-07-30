@@ -66,7 +66,7 @@ class _RecordingModePageState extends State<RecordingModePage> {
           decoration: const BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
-              image: AssetImage("assets/recording-mode-background.jpg"),
+              image: AssetImage("assets/backgrounds/hills-background.jpg"),
               fit: BoxFit.cover,
             ),
           ),

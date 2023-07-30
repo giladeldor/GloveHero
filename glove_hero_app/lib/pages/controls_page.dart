@@ -20,7 +20,9 @@ class ControlsPage extends StatelessWidget {
           decoration: const BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
-              image: AssetImage("assets/backgrounds/controls-glove.jpg"),
+              image: AssetImage(
+                "assets/backgrounds/controls-glove-background.jpg",
+              ),
               fit: BoxFit.fitWidth,
             ),
           ),

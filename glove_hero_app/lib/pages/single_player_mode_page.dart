@@ -120,7 +120,7 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
           decoration: const BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
-              image: AssetImage("assets/recording-mode-background.jpg"),
+              image: AssetImage("assets/hills-background.jpg"),
               fit: BoxFit.cover,
             ),
           ),

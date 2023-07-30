@@ -42,9 +42,7 @@ class _SongSelectionMenuPageState extends State<SongSelectionMenuPage> {
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                "assets/backgrounds/recording-page-background.jpeg",
-              ),
+              image: AssetImage("assets/backgrounds/hills-background.jpeg"),
               fit: BoxFit.cover,
             ),
           ),
