@@ -41,7 +41,10 @@ dependencies:
   carousel_slider: ^4.2.1
   just_audio: ^0.9.33
   path_provider: ^2.0.15
-  circular_countdown_timer: ^0.2.3
+  circular_countdown_timer:
+    git:
+      url: https://github.com/ceranco/circular_countdown_timer
+      ref: on_change_fix
   flutter_rating_bar: ^4.0.1
   auto_size_text: ^3.0.0
 
@@ -71,6 +74,7 @@ flutter:
     - assets/song-art/
     - assets/
     - assets/backgrounds/
+    - assets/default-touches/
   fonts:
     - family: Karmatic
       fonts:

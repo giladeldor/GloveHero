@@ -21,7 +21,7 @@ class SongHighScores {
   final List<HighScore> scores;
 
   SongHighScores.fromJson(Map<String, dynamic> json)
-      : maxNumScores = json['numScores'],
+      : maxNumScores = json['maxNumScores'],
         scores = (json['scores'] as List<dynamic>)
             .map((e) => HighScore.fromJson(e))
             .toList();

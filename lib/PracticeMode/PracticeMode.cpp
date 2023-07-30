@@ -20,7 +20,7 @@ constexpr int TouchStage::getNumStages() {
 }
 
 bool TouchStage::next() {
-    stage = max<int>(stage + 1, numStages - 1);
+    stage = min<int>(stage + 1, numStages - 1);
     return !missed();
 }
 
@@ -218,6 +218,10 @@ ScoreType Touch::reactToTouch(long timestamp) const {
 
 const Color& Touch::getColor() const {
     return stage.getColor();
+}
+
+const TouchStage& Touch::getStage() const {
+    return stage;
 }
 
 void Touch::setValid(bool valid) {

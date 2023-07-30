@@ -28,6 +28,7 @@ void setup() {
     practiceMode.setup(&ledManager, &glove);
     ble.setup([&]() { state = State::Connected; },
               [&]() {
+                  ble.clearColors();
                   state = State::PracticeMode;
                   practiceMode.startGame();
               });

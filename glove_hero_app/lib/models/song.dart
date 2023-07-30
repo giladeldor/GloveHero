@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
+import '../utils/functions.dart';
 import 'high_score.dart';
 
 class Song {
@@ -21,18 +22,21 @@ class Song {
   String get audioAsset => "assets/audio/$_assetTitle.mp3";
   String get artAsset => "assets/song-art/$_assetTitle.jpg";
   Future<File> get touchFile async {
-    return File("${await _localDir}/touches/$_assetTitle.json")
-        .create(recursive: true);
+    final file = File("${await localDir}/touches/$_assetTitle.json");
+    if (await file.exists() && await file.length() > 0) return file;
+
+    await file.create(recursive: true);
+    try {
+      await file.writeAsString(await rootBundle
+          .loadString("assets/default-touches/$_assetTitle.json"));
+    } catch (_) {}
+
+    return file;
   }
 
   Future<File> get highScoreFile async {
-    return File("${await _localDir}/high-scores/$_assetTitle.json")
-        .create(recursive: true);
-  }
-
-  Future<String> get _localDir async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+    final file = File("${await localDir}/high-scores/$_assetTitle.json");
+    return await file.create(recursive: true);
   }
 
   String get _assetTitle =>
@@ -182,24 +186,12 @@ class SongManager {
     ),
   ];
 
+  static Song getSongByName(String name) =>
+      songs.firstWhere((element) => element.name == name);
+
   static Future<SongHighScores> getHighScores(Song song) async {
     final file = await song.highScoreFile;
     late SongHighScores highScores;
-
-    if (song == songs[4]) {
-      highScores = SongHighScores();
-      highScores.addScore(HighScore(name: "NAD", score: 100));
-      highScores.addScore(HighScore(name: "EC", score: 100));
-      highScores.addScore(HighScore(name: "GLD", score: 50));
-      highScores.addScore(HighScore(name: "NAD", score: 150));
-      highScores.addScore(HighScore(name: "EC", score: 175));
-      highScores.addScore(HighScore(name: "GLD", score: 200));
-      highScores.addScore(HighScore(name: "NAD", score: 221));
-      highScores.addScore(HighScore(name: "EC", score: 300));
-      highScores.addScore(HighScore(name: "GLD", score: 1));
-      highScores.addScore(HighScore(name: "FCK", score: 75));
-      return highScores;
-    }
 
     try {
       highScores =
@@ -209,5 +201,13 @@ class SongManager {
       await file.writeAsString(jsonEncode(highScores));
     }
     return highScores;
+  }
+
+  static Future<void> saveHighScores(
+    Song song,
+    SongHighScores highScores,
+  ) async {
+    final file = await song.highScoreFile;
+    await file.writeAsString(jsonEncode(highScores), flush: true);
   }
 }

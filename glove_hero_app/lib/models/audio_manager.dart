@@ -30,16 +30,14 @@ abstract class AudioManager {
   }
 
   static void playClip(Song song) {
-    _playOperation = _playOperation.then(
-      (_) async {
-        await _player.setVolume(song.volume);
-        await _player.setAsset(song.audioAsset);
-        await _player.setClip(
-            start: Duration(seconds: song.previewSpan.start),
-            end: Duration(seconds: song.previewSpan.end));
-        _player.play();
-      },
-    );
+    _playOperation = _playOperation.then((_) async {
+      await _player.setVolume(song.volume);
+      await _player.setAsset(song.audioAsset);
+      await _player.setClip(
+          start: Duration(seconds: song.previewSpan.start),
+          end: Duration(seconds: song.previewSpan.end));
+      _player.play();
+    }, onError: (_) {});
   }
 
   static void dispose() {

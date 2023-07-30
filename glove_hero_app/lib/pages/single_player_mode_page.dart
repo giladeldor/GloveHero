@@ -1,19 +1,28 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:glove_hero_app/models/touch.dart';
-import 'package:glove_hero_app/utils/painter.dart';
-import 'package:glove_hero_app/utils/styles.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:glove_hero_app/models/high_score.dart';
+import 'package:glove_hero_app/models/statistics.dart';
+import 'package:glove_hero_app/widgets/get_name_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
+import '../models/score.dart';
+import '../models/touch.dart';
+import '../utils/painter.dart';
+import '../utils/styles.dart';
+import '../widgets/countdown.dart';
+import '../widgets/glove_controls.dart';
 import '../models/audio_manager.dart';
 import '../models/ble.dart';
 import '../models/song.dart';
 import '../utils/constants.dart';
+import 'leaderboard_page.dart';
 
 class SinglePlayerModePage extends StatefulWidget {
   const SinglePlayerModePage({super.key, required this.song});
@@ -24,20 +33,47 @@ class SinglePlayerModePage extends StatefulWidget {
 }
 
 class _SinglePlayerModePageState extends State<SinglePlayerModePage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   int _score = 0;
+
+  bool _isVisible = true;
   Song get _song => widget.song;
   SongTouches? _songTouches;
   late List<Touch>? _touches;
   late StreamSubscription<PlayerState>? _onSongEndSubscription;
-  late BleInput _input;
+  late BleModel _bleModel;
   var _events = <_TouchEvent>[];
-  final HashMap<Touch, _ScoreType> _scores = HashMap();
+  Touch? _longTouch;
+  int _lastUpdate = 0;
+  final _statistics = SongStatistics();
+  Future<void> _colorFuture = Future.value();
+  late Ticker _ticker;
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> endSong() async {
+    _onSongEndSubscription?.cancel();
 
+    final name = await showDialog(
+      context: context,
+      builder: (BuildContext context) => const GetNameDialog(),
+    );
+
+    final highScores = await SongManager.getHighScores(_song);
+    highScores.addScore(HighScore(name: name, score: _score));
+    await SongManager.saveHighScores(_song, highScores);
+    await StatisticsManager.addStatistics(_song, _statistics);
+
+    if (context.mounted) {
+      await Navigator.of(context).maybePop().then(
+            (_) => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LeaderboardPage(initialSong: _song),
+              ),
+            ),
+          );
+    }
+  }
+
+  void startSong() {
     _song.touchFile.then((file) {
       try {
         _songTouches = SongTouches.fromJson(
@@ -48,43 +84,65 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
       } catch (_) {
         _songTouches = SongTouches();
         for (var i = 0; i < 50; i++) {
-          _songTouches!.addTouch(
-              Touch.regular(input: Input.input1, timeStamp: i * 1000));
+          _songTouches!.addTouch(Touch.regular(
+              input: Input.fromIdx(Random().nextInt(4)),
+              timeStamp: i * Random().nextInt(500) + 100));
         }
       }
       _touches = _songTouches!.touches.toList();
 
       AudioManager.playSong(_song);
+      _onSongEndSubscription = AudioManager.onSongEnd(
+        endSong,
+      );
 
-      createTicker((_) {
+      _ticker = createTicker((_) {
         // Redraw each frame.
-        setState(() {});
         _tick();
-      }).start();
-    });
-
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _input = context.read<BleInput>();
-      _input.addPressListener(_handleInput);
+        setState(() {});
+      });
+      _ticker.start();
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _bleModel = context.read<BleModel>());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return GloveControls(
+      onPress: _onPress,
+      onPop: _onPop,
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
-              image: AssetImage("assets/recording-mode-background.jpg"),
+              image: AssetImage("assets/backgrounds/hills-background.jpg"),
               fit: BoxFit.cover,
             ),
           ),
           child: Stack(
             children: [
+              _isVisible
+                  ? Flexible(
+                      child: Center(
+                        child: CountDown(
+                          onComplete: () {
+                            setState(() {
+                              _isVisible = false;
+                              startSong();
+                            });
+                          },
+                        ),
+                      ),
+                    )
+                  : const Spacer(),
               Consumer<BleInput>(
                 builder: (context, input, child) {
                   return CustomPaint(
@@ -110,22 +168,18 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     );
   }
 
-  Future<bool> _onWillPop() async {
-    AudioManager.stop();
-    _onSongEndSubscription?.cancel();
-
-    return true;
-  }
-
   @override
   void dispose() {
+    _ticker.dispose();
     super.dispose();
-
-    WidgetsBinding.instance.removeObserver(this);
-    _input.removePressListener(_handleInput);
   }
 
-  void _handleInput(Input input) {
+  void _onPop() {
+    AudioManager.stop();
+    _onSongEndSubscription?.cancel();
+  }
+
+  void _onPress(Input input) {
     if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
       return;
     }
@@ -148,6 +202,8 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
     if (_touches!.isEmpty) return;
 
     for (var event in events) {
+      _longTouch = null;
+
       final nextTouch = _touches!.indexed.where((element) {
         final (_, touch) = element;
         return touch.input == event.input;
@@ -156,21 +212,64 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
 
       final (index, touch) = nextTouch;
       final diff = (touch.timeStamp - event.timestamp).abs();
-      final scoreType = _ScoreType.fromDiff(diff, touchOffset);
+      final scoreType = ScoreType.fromDiff(diff, touchOffset);
 
-      if (scoreType == _ScoreType.miss) continue; // TODO: change leds + score
+      if (scoreType != ScoreType.miss && touch.type == TouchType.long) {
+        _longTouch = touch;
+        _lastUpdate = timeStamp;
+      }
 
-      _scores[touch] = scoreType;
+      _statistics.addScore(touch.input, scoreType);
       _score += scoreType.score;
-      // TODO: change leds
-      _touches!.removeRange(0, index + 1);
+
+      _setColor(touch, scoreType);
+
+      if (scoreType != ScoreType.miss) {
+        _touches!.removeRange(0, index + 1);
+      }
+    }
+
+    if (_longTouch != null) {
+      final endStamp = _longTouch!.timeStamp + _longTouch!.duration!;
+      if (timeStamp > endStamp) {
+        _longTouch = null;
+      } else {
+        final elapsed = timeStamp - _lastUpdate;
+        if (elapsed >= 50) {
+          _lastUpdate = timeStamp;
+          final score = (elapsed / 50).floor() * 10;
+          _score += score;
+        }
+      }
     }
 
     while (_touches!.isNotEmpty &&
         _touches!.first.timeStamp < timeStamp - touchOffset) {
       final touch = _touches!.removeAt(0);
-      _scores[touch] = _ScoreType.miss;
+      _statistics.addScore(touch.input, ScoreType.miss);
+
+      _setColor(touch, ScoreType.miss);
     }
+  }
+
+  void _setColor(Touch touch, ScoreType scoreType) {
+    _colorFuture = _colorFuture
+        .then(
+      (_) => _bleModel.setColor(
+        input: touch.input,
+        color: scoreType.color,
+      ),
+    )
+        .then(
+      (_) async {
+        final delay = touch.type == TouchType.long ? touch.duration! : 100;
+        await Future.delayed(Duration(milliseconds: delay));
+        _bleModel.setColor(
+          input: touch.input,
+          color: Colors.black,
+        );
+      },
+    );
   }
 }
 
@@ -279,26 +378,4 @@ class _TouchEvent {
     required this.input,
     required this.timestamp,
   });
-}
-
-enum _ScoreType {
-  good,
-  bad,
-  miss;
-
-  factory _ScoreType.fromDiff(int diff, int offset) {
-    if (diff <= offset / 2) {
-      return _ScoreType.good;
-    } else if (diff <= offset) {
-      return _ScoreType.bad;
-    } else {
-      return _ScoreType.miss;
-    }
-  }
-
-  int get score => switch (this) {
-        _ScoreType.good => goodScore,
-        _ScoreType.bad => badScore,
-        _ScoreType.miss => missScore,
-      };
 }

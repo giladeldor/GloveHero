@@ -45,6 +45,13 @@ enum Input {
         Input.input3 => 2,
         Input.input4 => 3
       };
+
+  static const List<Input> realValues = [
+    Input.input1,
+    Input.input2,
+    Input.input3,
+    Input.input4
+  ];
 }
 
 class BleModel {
@@ -109,6 +116,25 @@ class BleModel {
       _indexLedCharacteristic!,
       value: [indexColor.red, indexColor.green, indexColor.blue],
     );
+  }
+
+  void setColor({required Input input, required Color color}) {
+    switch (input) {
+      case Input.input1:
+        pinkyColor = color;
+        break;
+      case Input.input2:
+        ringColor = color;
+        break;
+      case Input.input3:
+        middleColor = color;
+        break;
+      case Input.input4:
+        indexColor = color;
+        break;
+      default:
+        break;
+    }
   }
 
   Future<Color> _getColorValue(QualifiedCharacteristic? characteristic) async {
