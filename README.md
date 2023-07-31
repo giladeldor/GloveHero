@@ -3,9 +3,9 @@
 > :guitar: Glove Up, Rock On! :rocket:
 
 Glove Hero is a project that helps patients rehabilitate their hands with basic motions.  
-The project acts as a gamification of the rehabilitation tasks, as the motions are integrated into the game seamlessly.
+The project acts as a gamification of rehabilitation tasks, as the motions are integrated into the game seamlessly.
 
-The project built from two integrated components:
+The project was made from two integrated components:
 1. The glove - a custom built glove that acts as the physical medium with which the player (patient) interacts.
 2. The app - a Flutter app which allows the player to play a ["Guitar Hero"-like](https://www.youtube.com/watch?v=i50jKW1b8HM&t=70s) game and keep track of scores and statistics regarding their rehabilitaion.
 
