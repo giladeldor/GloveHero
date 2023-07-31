@@ -20,6 +20,9 @@ import '../models/ble.dart';
 import '../models/song.dart';
 import '../utils/constants.dart';
 
+/// The page for playing a song in single player mode.
+///
+/// The page delegates to [SinglePlayerGame] for the game logic.
 class SinglePlayerModePage extends StatefulWidget {
   const SinglePlayerModePage({super.key, required this.song});
   final Song song;

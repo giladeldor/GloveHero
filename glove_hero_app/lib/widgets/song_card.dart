@@ -7,6 +7,7 @@ import 'package:glove_hero_app/models/song.dart';
 import '../models/touch.dart';
 import '../utils/styles.dart';
 
+/// A card that displays a song's name, art and difficulty (if recorded).
 class SongCard extends StatelessWidget {
   SongCard({
     super.key,

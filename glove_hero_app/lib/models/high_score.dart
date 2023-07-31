@@ -1,3 +1,4 @@
+/// Represents a high-score record.
 class HighScore {
   HighScore({this.name = 'NO HIGH SCORE', this.score = -1});
 
@@ -14,6 +15,9 @@ class HighScore {
       };
 }
 
+/// A limited number of high scores for a song.
+///
+/// When new high scores are added, the lowest score is removed (if needed).
 class SongHighScores {
   SongHighScores({this.maxNumScores = 10}) : scores = [];
 

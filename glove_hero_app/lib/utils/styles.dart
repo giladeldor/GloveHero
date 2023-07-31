@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/ble.dart';
 
+/// The various styles used throughout the app.
+
 const titleTextStyle = TextStyle(
   fontFamily: "Karmatic",
   fontSize: 45,

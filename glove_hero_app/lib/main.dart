@@ -28,6 +28,7 @@ void main() async {
   );
 }
 
+/// The entry widget for the app.
 class GloveHeroApp extends StatelessWidget {
   const GloveHeroApp({super.key});
 
@@ -40,18 +41,8 @@ class GloveHeroApp extends StatelessWidget {
       ),
       home: const SafeArea(
         child: MenuPage(),
-        // child: Test(),
       ),
       debugShowCheckedModeBanner: false,
     );
-  }
-}
-
-class Test extends StatelessWidget {
-  const Test({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return RedirectToRecordDialog(song: SongManager.songs[0]);
   }
 }

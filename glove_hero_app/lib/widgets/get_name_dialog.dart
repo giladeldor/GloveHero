@@ -7,6 +7,7 @@ import 'package:glove_hero_app/widgets/glove_controls.dart';
 
 import '../models/controller_action.dart';
 
+/// A dialog that allows the user to enter their name in an arcade-style.
 class GetNameDialog extends StatefulWidget {
   const GetNameDialog({super.key});
 

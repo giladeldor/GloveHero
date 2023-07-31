@@ -5,9 +5,10 @@ import 'package:glove_hero_app/widgets/glove_controls.dart';
 
 import '../models/song.dart';
 import '../pages/recording_mode_page.dart';
-import '../pages/single_player_mode_page.dart';
 import '../utils/styles.dart';
 
+/// A dialog that redirects the user to the recording mode page of a specific song when
+/// the song they selected does not have a recording.
 class RedirectToRecordDialog extends StatefulWidget {
   const RedirectToRecordDialog({
     Key? key,

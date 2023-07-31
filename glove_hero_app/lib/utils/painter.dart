@@ -6,6 +6,9 @@ import 'package:glove_hero_app/utils/styles.dart';
 import '../models/ble.dart';
 import '../models/touch.dart';
 
+/// A base class for painters that draw the touches on the screen.
+/// This allows the painters for the single-player and recording modes to share
+/// the logic for drawing touches.
 abstract class PainterBase extends CustomPainter {
   final _paintStroke = Paint()
     ..strokeWidth = 5

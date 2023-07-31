@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:glove_hero_app/models/controller_action.dart';
+
+import '../models/controller_action.dart';
 import '../utils/styles.dart';
 import '../widgets/glove_controls.dart';
 
+/// A page that displays the controls for the glove.
 class ControlsPage extends StatelessWidget {
   const ControlsPage({super.key});
 

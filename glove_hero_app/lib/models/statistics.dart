@@ -6,11 +6,13 @@ import 'ble.dart';
 import 'score.dart';
 import 'song.dart';
 
+/// The statistics for a single input.
 class InputStatistics {
   InputStatistics()
       : _scores = {},
         _totalTouches = 0;
 
+  /// Merges two [InputStatistics] objects into a new one.
   InputStatistics.merge(
       {required InputStatistics stats1, required InputStatistics stats2})
       : _scores = {
@@ -52,6 +54,7 @@ class InputStatistics {
         _totalTouches = json['totalTouches'];
 }
 
+/// The statistics for a single song.
 class SongStatistics {
   final int numPlays;
   final Map<Input, InputStatistics> _statistics;
@@ -96,6 +99,7 @@ class SongStatistics {
         };
 }
 
+/// Manager for the statistics of all songs in the game.
 class StatisticsManager {
   static Map<Song, SongStatistics>? __statistics;
 

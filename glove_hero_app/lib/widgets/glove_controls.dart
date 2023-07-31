@@ -3,6 +3,17 @@ import 'package:provider/provider.dart';
 
 import '../models/ble.dart';
 
+/// A widget that encapsulates the management needed to interact with the input
+/// from the glove.
+///
+/// This widget should be used whenever the state is controlled by the glove.
+///
+/// When using this widget, children should not use `Navigator.pop` to return to
+/// the previous screen. Instead, use the `Navigator.maybepop` callback to allow
+/// the widget to clean up after itself.
+///
+/// To refresh the widget-tree on input, consider using [Consumer<BleInput>] and to control
+/// the LEDs on the glove, use [Consumer<BleModel].
 class GloveControls extends StatefulWidget {
   const GloveControls(
       {super.key,

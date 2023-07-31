@@ -12,6 +12,7 @@ import '../utils/styles.dart';
 import '../models/ble.dart';
 import '../widgets/song_card.dart';
 
+/// A page that displays the statistics for each finger and each song.
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key});
 

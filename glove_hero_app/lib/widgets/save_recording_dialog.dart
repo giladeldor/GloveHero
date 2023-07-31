@@ -11,6 +11,7 @@ import '../models/song.dart';
 import '../models/touch.dart';
 import '../utils/styles.dart';
 
+/// A dialog that allows the user to set the difficulty of a song recording.
 class SaveRecordingDialog extends StatefulWidget {
   const SaveRecordingDialog({
     Key? key,

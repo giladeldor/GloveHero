@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+
 import '../models/song.dart';
 import '../utils/functions.dart';
 import '../widgets/glove_controls.dart';
@@ -8,6 +9,9 @@ import '../models/ble.dart';
 import '../models/controller_action.dart';
 import '../widgets/song_card.dart';
 
+/// A page that allows the user to select a song.
+///
+/// Used for recording mode and single-player mode.
 class SongSelectionMenuPage extends StatefulWidget {
   const SongSelectionMenuPage({super.key, required this.onSelect});
   final Function(Song song)? onSelect;

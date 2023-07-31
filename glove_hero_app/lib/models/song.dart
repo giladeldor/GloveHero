@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../utils/functions.dart';
 import 'high_score.dart';
 
+/// A song that can be played in the game.
 class Song {
   const Song({
     required this.name,
@@ -43,6 +44,7 @@ class Song {
       name.replaceAll(".", "").split(' ').join('-').toLowerCase();
 }
 
+/// A span of time in a song that can be previewed.
 class PreviewSpan {
   const PreviewSpan({required this.start, required this.end});
 
@@ -51,6 +53,7 @@ class PreviewSpan {
   Duration get duration => Duration(seconds: end - start);
 }
 
+/// The manager for all songs in the game.
 class SongManager {
   static const List<Song> songs = [
     Song(

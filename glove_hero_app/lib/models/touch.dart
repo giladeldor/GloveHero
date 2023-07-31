@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'ble.dart';
 
+/// A single touch, defined by the input, the type of touch, the time stamp and
+/// the duration.
 class Touch {
   final Input input;
   final TouchType type;
@@ -31,6 +33,7 @@ class Touch {
       };
 }
 
+/// Represents all of the touches for a single song.
 class SongTouches {
   final List<Touch> _touches;
   late int difficulty;
@@ -68,6 +71,7 @@ class SongTouches {
   }
 }
 
+/// The type of touch, either regular or long.
 enum TouchType {
   regular,
   long;
