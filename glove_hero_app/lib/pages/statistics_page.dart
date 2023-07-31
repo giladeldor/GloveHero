@@ -46,7 +46,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 [
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Image.asset("assets/statistics-glove.png"),
+                    child: SizedBox(
+                      height: 430,
+                      child: Image.asset(
+                        "assets/statistics-glove.png",
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,10 +122,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
     final centerWidth = MediaQuery.of(context).size.width / 2;
 
     final ({double left, double bottom}) position = switch (input) {
-      Input.input1 => (left: centerWidth - 125, bottom: 340),
-      Input.input2 => (left: centerWidth - 75, bottom: 370),
-      Input.input3 => (left: centerWidth - 22, bottom: 390),
-      Input.input4 => (left: centerWidth + 23, bottom: 365),
+      Input.input1 => (left: centerWidth - 125, bottom: 300),
+      Input.input2 => (left: centerWidth - 75, bottom: 325),
+      Input.input3 => (left: centerWidth - 22, bottom: 350),
+      Input.input4 => (left: centerWidth + 23, bottom: 325),
       _ => (left: 0, bottom: 0)
     };
 
