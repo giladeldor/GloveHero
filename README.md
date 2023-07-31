@@ -41,3 +41,46 @@ An in-depth explanation of the project can be found in the [project wiki](https:
   We use [our own fork](https://github.com/ceranco/circular_countdown_timer) which fixes a bug (PR [here](https://github.com/MuhammadUsamaSiddiqui/circular_countdown_timer/pull/56)).
 * [flutter_rating_bar](https://pub.dev/packages/flutter_rating_bar) - 4.0.1
 * [auto_size_text](https://pub.dev/packages/auto_size_text) - 3.0.0
+
+## Files and folders
+
+* `README.md` - this file.
+* `clang-format` - enforces a common coding style for C/C++ files.
+* `glove_hero_app/` - contains the source code and assets of the flutter application.
+  * `assets/` - contains all the assets for the app.
+    * `audio/` - contains all of the audio files (songs) used in the game.
+	* `backgrounds/` - contains the background images we use in the various screens of the app.
+	* `default-touches/` - contains default recordings for some of the songs in the app.
+	* `song-art/` - contains the images displayed for each song.
+  * `fonts/` - contains the fonts used in the app.
+  * `lib/` - contains the source code of the app.
+    * `models/` - contains the logic model of the app.
+	* `utils/` - contains various utilities used throughout the app.
+	  * `constants.dart` - contains all the constants used in the app.
+	* `widgets/` - contains the custom widgets we use in the app.
+	* `pages/` - contains the pages that comprise the app.
+	  
+* `glove_hero_glove/` - contains the assets and firmware for the glove.
+  * `assets/GloveHero.fzz` - the fritzing circuit of the glove.
+  * `lib/` - the various support libraries and classes used in the firmware.
+    * `Parameters/Parameters.h` - all the constants used in the firmware (specified later).
+	* `Ble/` - abstraction for the BLE communication.
+	* `Color/` - color POD.
+	* `Input/` - abstraction for handling input (both from the glove and from the keyboard for testing).
+	* `LedManager/` - abstraction for interacting with the leds.
+	* `PracticeMode/` - implemented the offline practice mode.
+	* `RedMP3/` - implements the protocol for communicating with the MP3 player (not used in final project).
+	* `Scheduler/` - a very basic task scheduler.
+  * `src/main.cpp` - the firmware loop.
+  * `test/` - the various tests we used.
+    * `ble_test.cpp` - a basic BLE example.
+	* `glove_test.cpp` - tests that the glove recognizes touches correctly.
+	* `keyboard_test.cpp` - tests that the keyboard input mock works, should be used with the `keyboard_input.py` script.
+	* `led_test.cpp` - checks that all of the leds on the glove work correctly.
+	* `mp3_test.cpp` - checks that the mp3 works (not used).
+	* `ble_app_test/` - a POC test app that comminucates with the ESP32 using BLE.
+  * `tools/` - tools we built to help development.
+    * `keyboard_input.py` - used to mock the actual touch-pins as input to the ESP32.
+	* `upload.sh` - uploads the firmware to the ESP32.
+	* `requirements.txt` - the python requirements for the `keyboard_input.py` script, install using `pip`.
+
