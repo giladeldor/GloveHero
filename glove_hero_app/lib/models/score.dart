@@ -2,11 +2,13 @@ import 'dart:ui';
 
 import '../utils/constants.dart';
 
+/// The possible score types.
 enum ScoreType {
   good,
   bad,
   miss;
 
+  /// Computes the [ScoreType] from the given [diff] and [offset].
   factory ScoreType.fromDiff(int diff, int offset) {
     if (diff <= offset / 2) {
       return ScoreType.good;
@@ -17,15 +19,17 @@ enum ScoreType {
     }
   }
 
+  /// The score corresponding to the [ScoreType].
   int get score => switch (this) {
         ScoreType.good => goodScore,
         ScoreType.bad => badScore,
         ScoreType.miss => missScore,
       };
 
+  /// The color corresponding to the [ScoreType].
   Color get color => switch (this) {
-        ScoreType.good => const Color.fromARGB(255, 0, 255, 0),
-        ScoreType.bad => const Color.fromARGB(255, 0, 0, 255),
-        ScoreType.miss => const Color.fromARGB(255, 255, 0, 0),
+        ScoreType.good => goodColor,
+        ScoreType.bad => badColor,
+        ScoreType.miss => missColor,
       };
 }

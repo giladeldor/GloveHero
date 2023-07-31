@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'models/song.dart';
 import 'models/ble.dart';
 import 'pages/menu_page.dart';
-import 'widgets/redirect_to_record_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +26,7 @@ void main() async {
   );
 }
 
+/// The entry widget for the app.
 class GloveHeroApp extends StatelessWidget {
   const GloveHeroApp({super.key});
 
@@ -40,18 +39,8 @@ class GloveHeroApp extends StatelessWidget {
       ),
       home: const SafeArea(
         child: MenuPage(),
-        // child: Test(),
       ),
       debugShowCheckedModeBanner: false,
     );
-  }
-}
-
-class Test extends StatelessWidget {
-  const Test({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return RedirectToRecordDialog(song: SongManager.songs[0]);
   }
 }

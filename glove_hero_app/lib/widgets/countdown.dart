@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 
 import '../utils/styles.dart';
 
+/// A countdown timer that changes color as it counts down.
 class CountDown extends StatefulWidget {
+  /// Creates a [CountDown] widget.
+  ///
+  /// [onComplete] is called when the countdown reaches 0.
   const CountDown({super.key, this.onComplete});
   final Function()? onComplete;
 
   @override
-  State<StatefulWidget> createState() => CountDownState();
+  State<StatefulWidget> createState() => _CountDownState();
 }
 
-class CountDownState extends State<CountDown> {
+class _CountDownState extends State<CountDown> {
   Function()? onComplete;
   Color _color = Colors.red;
   int _countdown = 2;

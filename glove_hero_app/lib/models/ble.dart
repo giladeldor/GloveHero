@@ -3,18 +3,21 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// The possible states of the BLE connection.
 enum BleConnectionState {
   disconnected,
   connecting,
   connected,
 }
 
+/// The possible states of the bluetooth on your phone.
 enum BleState {
   on,
   bluetoothPermissionDenied,
   bluetoothDisabled,
 }
 
+/// The possible inputs from the glove.
 enum Input {
   none,
 
@@ -46,6 +49,7 @@ enum Input {
         Input.input4 => 3
       };
 
+  /// The list of all possible inputs (without [Input.none]).
   static const List<Input> realValues = [
     Input.input1,
     Input.input2,
@@ -54,6 +58,7 @@ enum Input {
   ];
 }
 
+/// Abstraction for the communcating with the BLE device (glove).
 class BleModel {
   static final Uuid _serviceUuid =
       Uuid.parse("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -253,6 +258,10 @@ class BleModel {
   }
 }
 
+/// The state of the BLE connection.
+///
+/// Changes to the connection can be handled by listening to the [BleConnection] object,
+/// or by using [Consumer] or [Provider.of] on the [BleConnection] object.
 class BleConnection extends ChangeNotifier {
   BleConnectionState _state = BleConnectionState.disconnected;
 
@@ -268,6 +277,9 @@ class BleConnection extends ChangeNotifier {
   }
 }
 
+/// Abstracts the input from the glove by exposing listeners for touch and press events.
+///
+/// Prefer using a [GloveControls] widget rather than using this class directly.
 class BleInput extends ChangeNotifier {
   Input __value = Input.none;
 

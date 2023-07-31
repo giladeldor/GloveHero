@@ -14,6 +14,7 @@ import 'song.dart';
 import 'statistics.dart';
 import 'touch.dart';
 
+/// The game logic for single player mode.
 class SinglePlayerGame {
   final Song song;
   final Future<String> Function()? onGetName;
@@ -149,6 +150,7 @@ class SinglePlayerGame {
   }
 }
 
+/// A touch event that happened during the game.
 class TouchEvent {
   final Input input;
   final int timestamp;

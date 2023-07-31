@@ -15,6 +15,7 @@ import '../widgets/song_card.dart';
 import '../utils/functions.dart';
 import '../utils/painter.dart';
 
+/// The page for recording a song.
 class RecordingModePage extends StatefulWidget {
   const RecordingModePage({super.key, required this.song});
   final Song song;

@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+/// @brief NOT USED.
 class RedMP3 {
 public:
     RedMP3(uint8_t rxd, uint8_t txd);

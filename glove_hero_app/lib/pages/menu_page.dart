@@ -16,6 +16,7 @@ import '../models/controller_action.dart';
 import '../models/touch.dart';
 import '../utils/styles.dart';
 
+/// The main menu page of the app.
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 

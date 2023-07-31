@@ -151,7 +151,7 @@ void PracticeMode::execute() {
         if (timestamp - lastUpdate >= timePerRound) {
             lastUpdate = timestamp;
             for (auto&& touch : touches) {
-                if (touch.getValid() && !touch.next(timestamp)) {
+                if (touch.getValid() && !touch.next()) {
                     changeToEnd(timestamp);
                     Serial.println("Missed (no touch)");
                 }
@@ -188,7 +188,7 @@ void PracticeMode::touch(Input input, long timestamp) {
         return;
     }
 
-    ScoreType score = touch.reactToTouch(timestamp);
+    ScoreType score = touch.reactToTouch();
     Serial.println(String("Score: ") + toString(score));
     switch (score) {
         case ScoreType::Miss:
@@ -208,11 +208,11 @@ void PracticeMode::touch(Input input, long timestamp) {
 
 Touch::Touch() : valid(false) {}
 
-bool Touch::next(long timestamp) {
+bool Touch::next() {
     return valid && stage.next();
 }
 
-ScoreType Touch::reactToTouch(long timestamp) const {
+ScoreType Touch::reactToTouch() const {
     return stage.readyToTouch() ? ScoreType::Hit : ScoreType::Miss;
 }
 

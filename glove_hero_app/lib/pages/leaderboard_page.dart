@@ -10,6 +10,7 @@ import '../models/ble.dart';
 import '../models/controller_action.dart';
 import '../widgets/song_card.dart';
 
+/// A page that displays the high scores for each song.
 class LeaderboardPage extends StatefulWidget {
   LeaderboardPage({super.key, Song? initialSong})
       : initialSong = initialSong ?? SongManager.songs[0];
