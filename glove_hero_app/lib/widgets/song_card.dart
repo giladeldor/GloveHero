@@ -1,25 +1,29 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glove_hero_app/models/song.dart';
+import '../models/touch.dart';
 import '../utils/styles.dart';
 
 class SongCard extends StatelessWidget {
-  const SongCard({
+  SongCard({
     super.key,
-    required this.songName,
-    required this.songArtPath,
+    required this.song,
     this.onPressed,
-  });
+  })  : songName = song.name,
+        songArtPath = song.artAsset;
 
   final String songName;
   final String songArtPath;
+  final Song song;
   final void Function()? onPressed;
 
   static List<SongCard> songs({void Function()? onPressed}) => SongManager.songs
       .map(
         (song) => SongCard(
-          songName: song.title,
-          songArtPath: song.artAsset,
+          song: song,
           onPressed: onPressed,
         ),
       )
@@ -40,12 +44,21 @@ class SongCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    songArtPath,
-                    fit: BoxFit.fill,
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          songArtPath,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Padding(
@@ -60,6 +73,36 @@ class SongCard extends StatelessWidget {
                     fontSize: 25,
                   ),
                 ),
+              ),
+              FutureBuilder(
+                future: song.touchFile,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final file = snapshot.data!;
+                    late SongTouches touches;
+
+                    try {
+                      touches = SongTouches.fromJson(
+                        jsonDecode(
+                          file.readAsStringSync(),
+                        ),
+                      );
+                    } catch (_) {
+                      touches = SongTouches();
+                    }
+
+                    return RatingBarIndicator(
+                      itemCount: 3,
+                      rating: touches.difficulty.toDouble(),
+                      itemBuilder: (context, _) => const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               )
             ],
           ),

@@ -28,7 +28,7 @@ class _GetNameDialogState extends State<GetNameDialog> {
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         backgroundColor:
-            const Color.fromARGB(255, 186, 203, 236).withAlpha(100),
+            const Color.fromARGB(255, 186, 203, 236).withAlpha(170),
         title: const Text(
           "Enter Your Name",
           textAlign: TextAlign.center,
@@ -62,7 +62,8 @@ class _GetNameDialogState extends State<GetNameDialog> {
               child: Text(
                 "Save",
                 style: highScoreTextStyle.copyWith(
-                    fontSize: 25, color: Color.fromARGB(255, 246, 144, 119)),
+                    fontSize: 25,
+                    color: const Color.fromARGB(255, 246, 144, 119)),
               ),
             ),
           ],

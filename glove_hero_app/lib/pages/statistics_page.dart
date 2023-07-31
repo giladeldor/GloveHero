@@ -36,6 +36,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             ),
           ),
           child: Stack(
+            alignment: Alignment.center,
             children: Input.realValues
                     .map((input) => _getPercentWidget(
                           _statistics.getPercent(input, ScoreType.good) +
@@ -46,7 +47,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 [
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Image.asset("assets/statistics-glove.png"),
+                    child: SizedBox(
+                      height: 430,
+                      child: Image.asset(
+                        "assets/statistics-glove.png",
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -105,6 +112,18 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ),
                     ],
                   ),
+                  Positioned(
+                    bottom: _positionOfNumPlays().bottom,
+                    child: Text(
+                      "Plays:\n\n${_statistics.numPlays}",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HighScore'),
+                    ),
+                  ),
                 ],
           ),
         ),
@@ -112,26 +131,30 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  ({double left, double bottom}) _positionOf(Input input) {
+  ({double left, double bottom}) _positionOfInput(Input input) {
     final centerWidth = MediaQuery.of(context).size.width / 2;
 
     final ({double left, double bottom}) position = switch (input) {
-      Input.input1 => (left: centerWidth - 125, bottom: 340),
-      Input.input2 => (left: centerWidth - 75, bottom: 370),
-      Input.input3 => (left: centerWidth - 22, bottom: 390),
-      Input.input4 => (left: centerWidth + 23, bottom: 365),
+      Input.input1 => (left: centerWidth - 125, bottom: 300),
+      Input.input2 => (left: centerWidth - 75, bottom: 325),
+      Input.input3 => (left: centerWidth - 22, bottom: 350),
+      Input.input4 => (left: centerWidth + 23, bottom: 325),
       _ => (left: 0, bottom: 0)
     };
 
     return position;
   }
 
+  ({double? left, double? bottom}) _positionOfNumPlays() {
+    return (left: null, bottom: 110);
+  }
+
   Color _getPercentColor(int percent) {
-    if (percent < 50) {
+    if (percent < 40) {
       return Colors.red;
-    } else if (percent < 75) {
+    } else if (percent < 60) {
       return const Color.fromARGB(255, 254, 183, 78);
-    } else if (percent < 90) {
+    } else if (percent < 80) {
       return Colors.yellow;
     } else {
       return const Color.fromARGB(255, 100, 221, 113);
@@ -141,8 +164,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget _getPercentWidget(int percent, Input input) {
     percent = min(percent, 99);
     return Positioned(
-      left: _positionOf(input).left,
-      bottom: _positionOf(input).bottom,
+      left: _positionOfInput(input).left,
+      bottom: _positionOfInput(input).bottom,
       child: Text(
         "${percent.toString().padLeft(2, '0')}%",
         style: TextStyle(
