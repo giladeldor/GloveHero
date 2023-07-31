@@ -63,7 +63,7 @@ An in-depth explanation of the project can be found in the [project wiki](https:
 * `glove_hero_glove/` - contains the assets and firmware for the glove.
   * `assets/GloveHero.fzz` - the fritzing circuit of the glove.
   * `lib/` - the various support libraries and classes used in the firmware.
-    * `Parameters/Parameters.h` - all the constants used in the firmware (specified later).
+    * `Parameters/Parameters.h` - all the constants used in the firmware.
 	* `Ble/` - abstraction for the BLE communication.
 	* `Color/` - color POD.
 	* `Input/` - abstraction for handling input (both from the glove and from the keyboard for testing).
