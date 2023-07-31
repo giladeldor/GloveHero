@@ -48,13 +48,15 @@ class SongCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          songArtPath,
-                          fit: BoxFit.cover,
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            songArtPath,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

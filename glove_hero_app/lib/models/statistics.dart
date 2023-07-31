@@ -56,9 +56,7 @@ class SongStatistics {
   final int numPlays;
   final Map<Input, InputStatistics> _statistics;
 
-  SongStatistics()
-      : numPlays = 1,
-        _statistics = {};
+  SongStatistics({this.numPlays = 0}) : _statistics = {};
 
   SongStatistics.merge(
       {required SongStatistics stats1, required SongStatistics stats2})
