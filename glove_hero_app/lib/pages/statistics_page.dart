@@ -36,6 +36,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             ),
           ),
           child: Stack(
+            alignment: Alignment.center,
             children: Input.realValues
                     .map((input) => _getPercentWidget(
                           _statistics.getPercent(input, ScoreType.good) +
@@ -111,6 +112,18 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ),
                     ],
                   ),
+                  Positioned(
+                    bottom: _positionOfNumPlays().bottom,
+                    child: Text(
+                      "Plays:\n\n${_statistics.numPlays}",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HighScore'),
+                    ),
+                  ),
                 ],
           ),
         ),
@@ -118,7 +131,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  ({double left, double bottom}) _positionOf(Input input) {
+  ({double left, double bottom}) _positionOfInput(Input input) {
     final centerWidth = MediaQuery.of(context).size.width / 2;
 
     final ({double left, double bottom}) position = switch (input) {
@@ -130,6 +143,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
     };
 
     return position;
+  }
+
+  ({double? left, double? bottom}) _positionOfNumPlays() {
+    return (left: null, bottom: 110);
   }
 
   Color _getPercentColor(int percent) {
@@ -147,8 +164,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget _getPercentWidget(int percent, Input input) {
     percent = min(percent, 99);
     return Positioned(
-      left: _positionOf(input).left,
-      bottom: _positionOf(input).bottom,
+      left: _positionOfInput(input).left,
+      bottom: _positionOfInput(input).bottom,
       child: Text(
         "${percent.toString().padLeft(2, '0')}%",
         style: TextStyle(

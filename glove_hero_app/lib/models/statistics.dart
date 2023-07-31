@@ -53,13 +53,17 @@ class InputStatistics {
 }
 
 class SongStatistics {
+  final int numPlays;
   final Map<Input, InputStatistics> _statistics;
 
-  SongStatistics() : _statistics = {};
+  SongStatistics()
+      : numPlays = 1,
+        _statistics = {};
 
   SongStatistics.merge(
       {required SongStatistics stats1, required SongStatistics stats2})
-      : _statistics = {
+      : numPlays = stats1.numPlays + stats2.numPlays,
+        _statistics = {
           for (final input in Input.realValues)
             input: InputStatistics.merge(
               stats1: stats1._statistics[input] ?? InputStatistics(),
@@ -77,6 +81,7 @@ class SongStatistics {
       _statistics[input]?.getPercent(scoreType) ?? 0;
 
   Map<String, dynamic> toJson() => {
+        'numPlays': numPlays,
         'statistics': {
           for (final entry in _statistics.entries)
             entry.key.idx.toString(): entry.value.toJson(),
@@ -84,7 +89,8 @@ class SongStatistics {
       };
 
   SongStatistics.fromJson(Map<String, dynamic> json)
-      : _statistics = {
+      : numPlays = json['numPlays'] ?? 0,
+        _statistics = {
           for (final entry in json['statistics'].entries)
             Input.fromIdx(int.parse(entry.key)): InputStatistics.fromJson(
               entry.value,
