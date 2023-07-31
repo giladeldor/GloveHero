@@ -24,6 +24,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
   SongStatistics _statistics = SongStatistics();
 
   @override
+  void initState() {
+    StatisticsManager.getStatistics(SongManager.songs[0])
+        .then((value) => setState(() => _statistics = value));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GloveControls(
       onTouch: _onTouch,

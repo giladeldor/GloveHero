@@ -23,7 +23,7 @@ class SinglePlayerGame {
   late BleModel _bleModel;
   SongTouches? _songTouches;
   late List<Touch> _touches;
-  final _statistics = SongStatistics();
+  final _statistics = SongStatistics(numPlays: 1);
   StreamSubscription<PlayerState>? _onSongEndSubscription;
   Touch? _longTouch;
   int _lastUpdate = 0;
