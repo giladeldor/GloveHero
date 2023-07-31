@@ -71,19 +71,17 @@ class _SinglePlayerModePageState extends State<SinglePlayerModePage>
           child: Stack(
             children: [
               _isVisible
-                  ? Flexible(
-                      child: Center(
-                        child: CountDown(
-                          onComplete: () {
-                            setState(() {
-                              _isVisible = false;
-                              _startSong();
-                            });
-                          },
-                        ),
+                  ? Center(
+                      child: CountDown(
+                        onComplete: () {
+                          setState(() {
+                            _isVisible = false;
+                            _startSong();
+                          });
+                        },
                       ),
                     )
-                  : const Spacer(),
+                  : Container(),
               Consumer<BleInput>(
                 builder: (context, input, child) {
                   return CustomPaint(
